@@ -20,8 +20,7 @@ repositories {
 
 configurations.all {
 	resolutionStrategy {
-		failOnVersionConflict()
-		enableDependencyVerification()
+		force("org.jetbrains:annotations:23.0.0")
 	}
 }
 
