@@ -1,0 +1,12 @@
+server:
+  port: ${SERVER_PORT:6001}
+
+springdoc:
+  swagger-ui:
+    path: /docs
+  packages-to-scan: com.mycompany.shopping
+  paths-to-match: /**
+
+spring:
+  application:
+    name: shopping-api

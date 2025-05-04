@@ -1,4 +1,4 @@
-package com.mycompany.demo
+package com.mycompany.shopping
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
