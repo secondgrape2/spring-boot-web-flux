@@ -41,6 +41,10 @@ dependencies {
 	implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
 	implementation(kotlin("reflect"))
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
+	
+	// OpenAPI 3.0
+	implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.3.0")
+	
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("io.projectreactor:reactor-test")
