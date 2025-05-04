@@ -14,7 +14,12 @@ This project follows the **GitHub Flow** branching strategy.
 * Once work on a feature branch is complete and verified, it is merged back into the `main` branch, preferably via a Pull Request (PR) for review, even if working solo.
 * Feature branches are typically deleted after they have been successfully merged into `main`.
 
-## How to Run
+## How to Run in local
 ```bash
 ./gradlew bootRun
+```
+
+## How to run with container
+```bash
+docker compose up --build app
 ```
