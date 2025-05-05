@@ -9,8 +9,11 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
 import org.springframework.http.HttpStatus
 import org.springframework.web.server.ResponseStatusException
+import com.mycompany.shopping.common.exception.ErrorResponse
 
 @RestController
 @RequestMapping("/api/v1/products")
@@ -23,21 +26,30 @@ class ProductController(private val productService: ProductService) {
     )
     @ApiResponses(
         value = [
-            ApiResponse(responseCode = "200", description = "Successfully retrieved category minimum prices"),
-            ApiResponse(responseCode = "500", description = "Internal server error")
+            ApiResponse(
+                responseCode = "200",
+                description = "Successfully retrieved category minimum prices",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = CategoryMinPriceResponse::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "500",
+                description = "Internal Server Error",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ErrorResponse::class)
+                )]
+            )
         ]
     )
     @GetMapping("/categories/minimum-prices")
     fun getCategoryMinPrices(): Mono<ResponseEntity<CategoryMinPriceResponse>> {
-
         val categoryMinPricesWithTotalAmount = productService.getCategoryMinPricesWithTotalAmount()
-
         return categoryMinPricesWithTotalAmount
             .map { categoryMinPricesWithTotalAmount ->
                 ResponseEntity.ok(categoryMinPricesWithTotalAmount)
-            }
-            .onErrorResume { e ->
-                Mono.error(ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to retrieve category minimum prices"))
             }
     }
 } 
