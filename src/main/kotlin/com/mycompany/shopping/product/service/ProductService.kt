@@ -31,4 +31,29 @@ interface ProductService {
      * @return A Mono emitting [CategoryPriceRangeResponse] containing the lowest and highest priced products in the category
      */
     fun getCategoryPriceRange(category: Category): Mono<CategoryPriceRangeResponse>
+
+    /**
+     * Creates a new product.
+     *
+     * @param request The request containing product details
+     * @return A Mono emitting the created product response
+     */
+    fun createProduct(request: CreateProductRequest): Mono<ProductResponse>
+
+    /**
+     * Updates an existing product.
+     *
+     * @param id The ID of the product to update
+     * @param request The request containing updated product details
+     * @return A Mono emitting the updated product response
+     */
+    fun updateProduct(id: Long, request: UpdateProductRequest): Mono<ProductResponse>
+
+    /**
+     * Deletes a product by its ID.
+     *
+     * @param id The ID of the product to delete
+     * @return A Mono completing when the deletion is done
+     */
+    fun deleteProduct(id: Long): Mono<Void>
 }
