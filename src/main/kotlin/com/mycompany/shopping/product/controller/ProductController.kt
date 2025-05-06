@@ -19,6 +19,9 @@ import com.mycompany.shopping.product.dto.CategoryPriceRangeResponse
 import com.mycompany.shopping.product.domain.enums.Category
 import io.swagger.v3.oas.annotations.Parameter
 import com.mycompany.shopping.product.exceptions.InvalidCategoryException
+import com.mycompany.shopping.product.dto.CreateProductRequest
+import com.mycompany.shopping.product.dto.UpdateProductRequest
+import com.mycompany.shopping.product.dto.ProductResponse
 
 @RestController
 @RequestMapping("/api/v1/products")
@@ -50,6 +53,7 @@ class ProductController(private val productService: ProductService) {
         ]
     )
     @GetMapping("/categories/minimum-prices")
+    @ResponseStatus(HttpStatus.OK)
     fun getCategoryMinPrices(): Mono<ResponseEntity<CategoryMinPriceResponse>> {
         val minPricesResponse = productService.getCategoryMinPricesWithTotalAmount()
         return minPricesResponse
@@ -83,6 +87,7 @@ class ProductController(private val productService: ProductService) {
         ]
     )
     @GetMapping("/brands/lowest-total-price")
+    @ResponseStatus(HttpStatus.OK)
     fun getBrandWithLowestTotalPrice(): Mono<ResponseEntity<BrandLowestPriceResponse>> {
         return productService.getBrandWithLowestTotalPrice()
             .map { response ->
@@ -123,6 +128,7 @@ class ProductController(private val productService: ProductService) {
         ]
     )
     @GetMapping("/categories/{category}/price-range")
+    @ResponseStatus(HttpStatus.OK)
     fun getCategoryPriceRange(
         @Parameter(
             name = "category",
@@ -139,5 +145,38 @@ class ProductController(private val productService: ProductService) {
             .map { response ->
                 ResponseEntity.ok(response)
             }
+    }
+
+    @Operation(
+        summary = "Create a new product",
+        description = "Creates a new product with the provided details"
+    )
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    fun createProduct(@RequestBody request: CreateProductRequest): Mono<ProductResponse> {
+        return productService.createProduct(request)
+    }
+
+    @Operation(
+        summary = "Update a product",
+        description = "Updates a product with the provided details"
+    )
+    @PutMapping("/{productId}")
+    @ResponseStatus(HttpStatus.OK)
+    fun updateProduct(
+        @PathVariable productId: Long,
+        @RequestBody request: UpdateProductRequest
+    ): Mono<ProductResponse> {
+        return productService.updateProduct(productId, request)
+    }
+
+    @Operation(
+        summary = "Delete a product",
+        description = "Deletes a product with the provided ID"
+    )
+    @DeleteMapping("/{productId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun deleteProduct(@PathVariable productId: Long): Mono<Void> {
+        return productService.deleteProduct(productId)
     }
 } 

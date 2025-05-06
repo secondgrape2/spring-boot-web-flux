@@ -5,6 +5,7 @@ import com.mycompany.shopping.product.domain.enums.Category
 import com.mycompany.shopping.product.service.ProductService
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
+import java.time.LocalDateTime
 
 @Service
 class ProductServiceImpl : ProductService {
@@ -121,5 +122,36 @@ class ProductServiceImpl : ProductService {
                 highestPrice = mockHighestPrice
             )
         )
+    }
+
+    override fun createProduct(request: CreateProductRequest): Mono<ProductResponse> {
+        // TODO: Implement createProduct
+        return Mono.just(ProductResponse(
+            id = 1, 
+            name = request.name, 
+            price = request.price, 
+            brandId = request.brandId, 
+            categoryId = request.categoryId,
+            createdAt = LocalDateTime.now(),
+            updatedAt = LocalDateTime.now()
+        ))
+    }
+
+    override fun updateProduct(id: Long, request: UpdateProductRequest): Mono<ProductResponse> {
+        // TODO: Implement updateProduct
+        return Mono.just(ProductResponse(
+            id = id, 
+            name = request.name, 
+            price = request.price, 
+            brandId = request.brandId, 
+            categoryId = request.categoryId,
+            createdAt = LocalDateTime.now(),
+            updatedAt = LocalDateTime.now()
+        ))
+    }
+
+    override fun deleteProduct(id: Long): Mono<Void> {
+        // TODO: Implement deleteProduct
+        return Mono.empty()
     }
 } 
