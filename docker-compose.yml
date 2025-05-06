@@ -11,6 +11,7 @@ services:
       target: app_runner
     ports:
       - ${SERVER_PORT}:${SERVER_PORT}
+      - 8090:8090
   test:
     <<: *default-app
     build:
