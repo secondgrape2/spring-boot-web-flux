@@ -15,6 +15,10 @@ import org.springframework.http.HttpStatus
 import org.springframework.web.server.ResponseStatusException
 import com.mycompany.shopping.common.exception.ErrorResponse
 import com.mycompany.shopping.product.dto.BrandLowestPriceResponse
+import com.mycompany.shopping.product.dto.CategoryPriceRangeResponse
+import com.mycompany.shopping.product.domain.enums.Category
+import io.swagger.v3.oas.annotations.Parameter
+import com.mycompany.shopping.product.exceptions.InvalidCategoryException
 
 @RestController
 @RequestMapping("/api/v1/products")
@@ -47,10 +51,10 @@ class ProductController(private val productService: ProductService) {
     )
     @GetMapping("/categories/minimum-prices")
     fun getCategoryMinPrices(): Mono<ResponseEntity<CategoryMinPriceResponse>> {
-        val categoryMinPricesWithTotalAmount = productService.getCategoryMinPricesWithTotalAmount()
-        return categoryMinPricesWithTotalAmount
-            .map { categoryMinPricesWithTotalAmount ->
-                ResponseEntity.ok(categoryMinPricesWithTotalAmount)
+        val minPricesResponse = productService.getCategoryMinPricesWithTotalAmount()
+        return minPricesResponse
+            .map { response ->
+                ResponseEntity.ok(response)
             }
     }
 
@@ -81,6 +85,57 @@ class ProductController(private val productService: ProductService) {
     @GetMapping("/brands/lowest-total-price")
     fun getBrandWithLowestTotalPrice(): Mono<ResponseEntity<BrandLowestPriceResponse>> {
         return productService.getBrandWithLowestTotalPrice()
+            .map { response ->
+                ResponseEntity.ok(response)
+            }
+    }
+
+    @Operation(
+        summary = "Get price range by category",
+        description = "Returns the lowest and highest priced brands and their products for a given category"
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Successfully retrieved category price range",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = CategoryPriceRangeResponse::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "400",
+                description = "Invalid category name",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ErrorResponse::class),
+                )]
+            ),
+            ApiResponse(
+                responseCode = "500",
+                description = "Internal Server Error",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ErrorResponse::class)
+                )]
+            )
+        ]
+    )
+    @GetMapping("/categories/{category}/price-range")
+    fun getCategoryPriceRange(
+        @Parameter(
+            name = "category",
+            description = "Category name. Must be one of: top, outer, pants, sneakers, bag, hat, socks, accessory",
+            required = true,
+            example = "top"
+        )
+        @PathVariable category: String
+    ): Mono<ResponseEntity<CategoryPriceRangeResponse>> {
+        val parsedCategory: Category = Category.fromValue(category)
+            ?: throw InvalidCategoryException()
+
+        return productService.getCategoryPriceRange(parsedCategory)
             .map { response ->
                 ResponseEntity.ok(response)
             }

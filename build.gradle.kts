@@ -58,6 +58,15 @@ tasks.withType<KotlinCompile> {
 	}
 }
 
-tasks.test {
+// TODO: Consider how to separate and run unit tests and integration tests
+tasks.withType<Test> {
 	useJUnitPlatform()
+	this.testLogging {
+        this.showStandardStreams = true
+        events("passed", "failed")
+        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+        showExceptions = true
+        showCauses = true
+        showStackTraces = true
+    }
 }

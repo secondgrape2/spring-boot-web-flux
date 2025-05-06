@@ -16,16 +16,28 @@ This project follows the **GitHub Flow** branching strategy.
 
 ## 코드 빌드, 테스트, 실행 방법
 
-### 로컬 환경 (Gradle 사용)
+### 로컬 환경 실행 (Gradle 사용)
 
 ```bash
 ./gradlew bootRun
 ```
 
-### 컨테이너 환경 (Docker 사용)
+### 로컬 환경 테스트 (Gradle 사용)
+
+```bash
+./gradlew test
+```
+
+### 컨테이너 환경 실행 (Docker 사용)
 
 ```bash
 docker compose up --build app
+```
+
+### 컨테이너 환경 테스트 (Docker 사용)
+
+```bash
+docker compose up --build test
 ```
 
 

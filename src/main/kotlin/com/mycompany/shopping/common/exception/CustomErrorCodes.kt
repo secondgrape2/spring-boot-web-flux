@@ -1,5 +1,7 @@
 package com.mycompany.shopping.common.exception
 
+import com.mycompany.shopping.product.domain.enums.Category
+
 /**
  * Custom error codes for the application.
  * Each domain has its own range of error codes.
@@ -14,7 +16,10 @@ enum class CustomErrorCodes(
     val description: String
 ) {
     // Brand errors (2000 - 2099)
-    BRAND_NOT_FOUND(2000, "Brand not found");
+    BRAND_NOT_FOUND(2000, "Brand not found"),
+
+    // Category errors (2100 - 2199)
+    INVALID_CATEGORY(2100, "Invalid category name. Please use one of: ${Category.values().joinToString(", ") { it.name.lowercase() }}");
 
     companion object {
         /**
@@ -24,4 +29,4 @@ enum class CustomErrorCodes(
             return "E${code.toString().padStart(4, '0')}"
         }
     }
-} 
+}
