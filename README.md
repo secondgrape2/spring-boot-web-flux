@@ -48,3 +48,29 @@ docker compose up --build app
 API 문서는 Swagger를 사용하여 작성되었습니다.
 
 - Swagger UI: http://localhost:6001/docs
+
+
+### 3. 카테고리 별 최저가격 브랜드와 상품 가격, 총액을 조회하는 API
+
+- 카테고리가 추가 될 수 있어 array로 응답하도록 구현
+- 카테고리 별 lowestProduct 정보를 응답합니다.
+- lowestProduct는 price와 brand외에 추가 정보가 있을 수 있으므로 nested 형태로 응답합니다.
+- lowestProduct의 brand는 brand name외에 추가 정보가 있을 수 있으므로 nested 형태로 응답합니다.
+- 총액은 backend에서 계산하여 root에 포함하여 응답합니다.
+
+### 4. 단일 브랜드로 모든 카테고리 상품을 구매할 때 최저가격에 판매하는 브랜드와 카테고리의 상품가격, 총액을 조회하는 API
+
+- 응답값이 정해져 있으므로 인터페이스에 맞춰서 내려줍니다.
+
+### 5.  카테고리 이름으로 최저, 최고 가격 브랜드와 상품 가격을 조회하는 API
+
+- 요청값과 응답값이 정해져있으므로 인터페이스에 맞춰서 내려줍니다.
+
+### 6. 브랜드 및 상품을 추가 / 업데이트 / 삭제하는 API
+
+- brand와 product api를 분리하여 구현하였습니다.
+- brand api는 브랜드 추가, 수정, 삭제를 할 수 있습니다.
+- product api는 상품 추가, 수정, 삭제를 할 수 있습니다.
+- brand와 product는 라이프 사이클이 다르므로 별도로 관리합니다.
+- 삭제는 soft delete를 사용하였습니다.
+
