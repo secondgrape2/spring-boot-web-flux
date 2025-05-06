@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.springframework.http.HttpStatus
 import org.springframework.web.server.ResponseStatusException
 import com.mycompany.shopping.common.exception.ErrorResponse
+import com.mycompany.shopping.product.dto.BrandLowestPriceResponse
 
 @RestController
 @RequestMapping("/api/v1/products")
@@ -50,6 +51,38 @@ class ProductController(private val productService: ProductService) {
         return categoryMinPricesWithTotalAmount
             .map { categoryMinPricesWithTotalAmount ->
                 ResponseEntity.ok(categoryMinPricesWithTotalAmount)
+            }
+    }
+
+    @Operation(
+        summary = "Get brand with lowest total price",
+        description = "Returns the brand that offers the lowest total price across all categories"
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Successfully retrieved brand with lowest total price",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = BrandLowestPriceResponse::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "500",
+                description = "Internal Server Error",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ErrorResponse::class)
+                )]
+            )
+        ]
+    )
+    @GetMapping("/brands/lowest-total-price")
+    fun getBrandWithLowestTotalPrice(): Mono<ResponseEntity<BrandLowestPriceResponse>> {
+        return productService.getBrandWithLowestTotalPrice()
+            .map { response ->
+                ResponseEntity.ok(response)
             }
     }
 } 

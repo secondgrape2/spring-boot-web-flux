@@ -15,4 +15,11 @@ interface ProductService {
      * @return A Mono emitting [CategoryMinPriceResponse] objects, each representing the lowest priced product in a category.
      */
     fun getCategoryMinPricesWithTotalAmount(): Mono<CategoryMinPriceResponse>
+
+    /**
+     * Retrieves the brand that offers the lowest total price across all categories.
+     *
+     * @return A Mono emitting [BrandLowestPriceResponse] containing the brand with lowest total price and its products.
+     */
+    fun getBrandWithLowestTotalPrice(): Mono<BrandLowestPriceResponse>
 }
