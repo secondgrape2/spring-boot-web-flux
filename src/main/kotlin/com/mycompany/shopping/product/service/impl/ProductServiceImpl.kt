@@ -1,12 +1,7 @@
 package com.mycompany.shopping.product.service.impl
 
-import com.mycompany.shopping.product.dto.Brand
-import com.mycompany.shopping.product.dto.BrandLowestPriceInfo
-import com.mycompany.shopping.product.dto.BrandLowestPriceResponse
-import com.mycompany.shopping.product.dto.CategoryLowestPriceInfo
-import com.mycompany.shopping.product.dto.CategoryMinPriceResponse
-import com.mycompany.shopping.product.dto.CategoryPriceInfo
-import com.mycompany.shopping.product.dto.LowestProductDetails
+import com.mycompany.shopping.product.dto.*
+import com.mycompany.shopping.product.domain.enums.Category
 import com.mycompany.shopping.product.service.ProductService
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
@@ -19,56 +14,56 @@ class ProductServiceImpl : ProductService {
         // TODO: Remove this mock data after implementing the actual data source
         val mockCategories = listOf(
             CategoryLowestPriceInfo(
-                category = "top",
+                category = Category.TOP,
                 lowestProduct = LowestProductDetails(
                     brand = Brand(name = "A"),
                     price = 11200
                 )
             ),
             CategoryLowestPriceInfo(
-                category = "outer",
+                category = Category.OUTER,
                 lowestProduct = LowestProductDetails(
                     brand = Brand(name = "E"),
                     price = 5000
                 )
             ),
             CategoryLowestPriceInfo(
-                category = "pants",
+                category = Category.PANTS,
                 lowestProduct = LowestProductDetails(
                     brand = Brand(name = "D"),
                     price = 3000
                 )
             ),
             CategoryLowestPriceInfo(
-                category = "sneakers",
+                category = Category.SNEAKERS,
                 lowestProduct = LowestProductDetails(
                     brand = Brand(name = "G"),
                     price = 9000
                 )
             ),
             CategoryLowestPriceInfo(
-                category = "bag",
+                category = Category.BAG,
                 lowestProduct = LowestProductDetails(
                     brand = Brand(name = "A"),
                     price = 2000
                 )
             ),
             CategoryLowestPriceInfo(
-                category = "hat",
+                category = Category.HAT,
                 lowestProduct = LowestProductDetails(
                     brand = Brand(name = "D"),
                     price = 1500
                 )
             ),
             CategoryLowestPriceInfo(
-                category = "socks",
+                category = Category.SOCKS,
                 lowestProduct = LowestProductDetails(
                     brand = Brand(name = "I"),
                     price = 1700
                 )
             ),
             CategoryLowestPriceInfo(
-                category = "accessory",
+                category = Category.ACCESSORY,
                 lowestProduct = LowestProductDetails(
                     brand = Brand(name = "F"),
                     price = 1900
@@ -84,14 +79,14 @@ class ProductServiceImpl : ProductService {
     override fun getBrandWithLowestTotalPrice(): Mono<BrandLowestPriceResponse> {
         // TODO: Remove this mock data after implementing the actual data source
         val mockCategories = listOf(
-            CategoryPriceInfo("top", "10,100"),
-            CategoryPriceInfo("outer", "5,100"),
-            CategoryPriceInfo("pants", "3,000"),
-            CategoryPriceInfo("sneakers", "9,500"),
-            CategoryPriceInfo("bag", "2,500"),
-            CategoryPriceInfo("hat", "1,500"),
-            CategoryPriceInfo("socks", "2,400"),
-            CategoryPriceInfo("accessory", "2,000")
+            CategoryPriceInfo(Category.TOP, "10,100"),
+            CategoryPriceInfo(Category.OUTER, "5,100"),
+            CategoryPriceInfo(Category.PANTS, "3,000"),
+            CategoryPriceInfo(Category.SNEAKERS, "9,500"),
+            CategoryPriceInfo(Category.BAG, "2,500"),
+            CategoryPriceInfo(Category.HAT, "1,500"),
+            CategoryPriceInfo(Category.SOCKS, "2,400"),
+            CategoryPriceInfo(Category.ACCESSORY, "2,000")
         )
 
         val brandLowestPriceInfo = BrandLowestPriceInfo(
@@ -101,5 +96,30 @@ class ProductServiceImpl : ProductService {
         )
 
         return Mono.just(BrandLowestPriceResponse(brandLowestPriceInfo))
+    }
+
+    override fun getCategoryPriceRange(category: Category): Mono<CategoryPriceRangeResponse> {
+        // TODO: Remove this mock data after implementing the actual data source
+        val mockLowestPrice = listOf(
+            BrandPriceInfo(
+                brand = "C",
+                price = "10,000"
+            )
+        )
+
+        val mockHighestPrice = listOf(
+            BrandPriceInfo(
+                brand = "I",
+                price = "11,400"
+            )
+        )
+
+        return Mono.just(
+            CategoryPriceRangeResponse(
+                category = category,
+                lowestPrice = mockLowestPrice,
+                highestPrice = mockHighestPrice
+            )
+        )
     }
 } 
