@@ -42,6 +42,10 @@ dependencies {
 	implementation(kotlin("reflect"))
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
 	
+	// H2 Database
+	implementation("io.r2dbc:r2dbc-h2")
+	implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
+	
 	// OpenAPI 3.0
 	implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.3.0")
 	
