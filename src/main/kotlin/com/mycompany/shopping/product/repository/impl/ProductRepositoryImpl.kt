@@ -15,9 +15,13 @@ import com.mycompany.shopping.product.domain.ProductWithBrandDomain
 import com.mycompany.shopping.product.domain.enums.ProductCategory
 import com.mycompany.shopping.brand.domain.BrandDomain
 import com.mycompany.shopping.product.repository.impl.CheapestProductByCategoryQueryResult
+import com.mycompany.shopping.product.domain.MinMaxPriceProductWithBrandDomain
+import com.mycompany.shopping.product.domain.MinMaxPriceProductWithBrandQueryInfo
+
 
 @Repository
 interface ProductR2dbcRepository : ReactiveCrudRepository<ProductEntity, Long> {
+
     @Modifying
     @Query("UPDATE products SET deleted_at = :deletedAt, updated_at = :updatedAt WHERE id = :id AND deleted_at IS NULL")
     fun markAsDeleted(id: Long, deletedAt: Instant, updatedAt: Instant): Mono<Integer>
@@ -63,6 +67,23 @@ interface ProductR2dbcRepository : ReactiveCrudRepository<ProductEntity, Long> {
           AND b.updated_at IS NOT NULL;
     """)
     fun findCheapestProductsByCategory(): Flux<CheapestProductByCategoryQueryResult>
+
+    @Query("""
+        (SELECT p.id, p.name, p.price, p.brand_id, p.category_id, p.created_at, p.updated_at,
+                b.name AS brand_name, b.created_at AS brand_created_at, b.updated_at AS brand_updated_at
+         FROM products p
+         JOIN brands b ON p.brand_id = b.id
+         WHERE p.category_id = :categoryId AND p.deleted_at IS NULL
+         ORDER BY p.price ASC LIMIT 1)
+        UNION ALL
+        (SELECT p.id, p.name, p.price, p.brand_id, p.category_id, p.created_at, p.updated_at,
+                b.name AS brand_name, b.created_at AS brand_created_at, b.updated_at AS brand_updated_at
+         FROM products p
+         JOIN brands b ON p.brand_id = b.id
+         WHERE p.category_id = :categoryId AND p.deleted_at IS NULL
+         ORDER BY p.price DESC LIMIT 1)
+    """)
+    fun findMinMaxPriceProductsWithBrandByCategoryId(categoryId: Long): Flux<MinMaxPriceProductWithBrandQueryResult>
 }
 
 @Repository("productRepository")
@@ -126,6 +147,46 @@ class ProductRepositoryR2dbcImpl(
                         updatedAt = it.brand_updated_at,
                     ),
                     categoryName = ProductCategory.valueOf(it.category_name)
+                )
+            }
+    }
+
+    override fun findMinMaxPriceProductsWithBrandByCategoryId(categoryId: Long): Mono<MinMaxPriceProductWithBrandDomain> {
+        return productR2dbcRepository.findMinMaxPriceProductsWithBrandByCategoryId(categoryId)
+            .collectList()
+            .map { list ->
+                val minPriceProduct = list.first()
+                val maxPriceProduct = list.last()
+                MinMaxPriceProductWithBrandDomain(
+                    categoryId = categoryId,
+                    minPriceProduct = MinMaxPriceProductWithBrandQueryInfo(
+                        id = minPriceProduct.id,
+                        name = minPriceProduct.name,
+                        price = minPriceProduct.price,
+                        brandId = minPriceProduct.brand_id,
+                        createdAt = minPriceProduct.created_at,
+                        updatedAt = minPriceProduct.updated_at,
+                        brand = BrandDomain(
+                            id = minPriceProduct.brand_id,
+                            name = minPriceProduct.brand_name,
+                            createdAt = minPriceProduct.brand_created_at,
+                            updatedAt = minPriceProduct.brand_updated_at,
+                        )
+                    ),
+                    maxPriceProduct = MinMaxPriceProductWithBrandQueryInfo(
+                        id = maxPriceProduct.id,
+                        name = maxPriceProduct.name,
+                        price = maxPriceProduct.price,
+                        brandId = maxPriceProduct.brand_id,
+                        createdAt = maxPriceProduct.created_at,
+                        updatedAt = maxPriceProduct.updated_at,
+                        brand = BrandDomain(
+                            id = maxPriceProduct.brand_id,
+                            name = maxPriceProduct.brand_name,
+                            createdAt = maxPriceProduct.brand_created_at,
+                            updatedAt = maxPriceProduct.brand_updated_at,
+                        )
+                    )
                 )
             }
     }
