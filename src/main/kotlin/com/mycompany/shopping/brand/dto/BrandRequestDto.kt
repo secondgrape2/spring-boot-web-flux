@@ -2,17 +2,16 @@ package com.mycompany.shopping.brand.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.NotBlank
-import com.fasterxml.jackson.annotation.JsonFormat
-import org.springframework.http.HttpStatus
+import com.mycompany.shopping.brand.interfaces.BrandRequest
 
-data class CreateBrandRequest(
+data class CreateBrandRequestDto(
     @Schema(description = "Brand name")
     @NotBlank(message = "Brand name is required")
-    val name: String
-)
+    override val name: String
+) : BrandRequest
 
-data class UpdateBrandRequest(
+data class UpdateBrandRequestDto(
     @Schema(description = "Brand name")
     @NotBlank(message = "Brand name is required")
-    val name: String
-)
+    override val name: String
+) : BrandRequest

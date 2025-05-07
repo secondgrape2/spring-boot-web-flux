@@ -1,21 +1,25 @@
 package com.mycompany.shopping.brand.controller
 
-import com.mycompany.shopping.brand.dto.CreateBrandRequest
-import com.mycompany.shopping.brand.dto.UpdateBrandRequest
-import com.mycompany.shopping.brand.dto.BrandResponse
+import org.springframework.web.bind.annotation.*
+import com.mycompany.shopping.brand.dto.CreateBrandRequestDto
+import com.mycompany.shopping.brand.dto.UpdateBrandRequestDto
+import com.mycompany.shopping.brand.dto.BrandResponseDto
 import com.mycompany.shopping.brand.service.BrandService
 import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import io.swagger.v3.oas.annotations.tags.Tag
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
-import io.swagger.v3.oas.annotations.parameters.RequestBody
+import org.springframework.http.ResponseEntity
+import org.springframework.validation.annotation.Validated
+import jakarta.validation.Valid
+import org.slf4j.LoggerFactory
 
 @Tag(name = "Brand", description = "Brand management APIs")
 @RestController
 @RequestMapping("/api/v1/brands")
+@Validated
 class BrandController(
     private val brandService: BrandService
 ) {
@@ -25,8 +29,10 @@ class BrandController(
     )
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    fun createBrand(@RequestBody request: CreateBrandRequest): Mono<BrandResponse> {
-        return brandService.createBrand(request)
+    fun createBrand(
+        @Valid @RequestBody dto: CreateBrandRequestDto
+    ): Mono<BrandResponseDto> {
+        return brandService.createBrand(dto)
     }
 
     @Operation(
@@ -37,8 +43,8 @@ class BrandController(
     @ResponseStatus(HttpStatus.OK)
     fun updateBrand(
         @PathVariable brandId: Long,
-        @RequestBody request: UpdateBrandRequest
-    ): Mono<BrandResponse> {
+        @Valid @RequestBody request: UpdateBrandRequestDto
+    ): Mono<BrandResponseDto> {
         return brandService.updateBrand(brandId, request)
     }
 

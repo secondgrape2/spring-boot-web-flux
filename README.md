@@ -83,5 +83,4 @@ API 문서는 Swagger를 사용하여 작성되었습니다.
 - brand와 product api를 분리하여 구현하였습니다.
 - brand api는 브랜드 추가, 수정, 삭제를 할 수 있습니다.
 - product api는 상품 추가, 수정, 삭제를 할 수 있습니다.
-- brand와 product는 라이프 사이클이 다르므로 별도로 관리합니다.
 - 삭제는 soft delete를 사용하였습니다.
