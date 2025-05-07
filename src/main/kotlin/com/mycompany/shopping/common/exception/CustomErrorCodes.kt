@@ -1,6 +1,6 @@
 package com.mycompany.shopping.common.exception
 
-import com.mycompany.shopping.product.domain.enums.Category
+import com.mycompany.shopping.product.domain.enums.ProductCategory
 
 /**
  * Custom error codes for the application.
@@ -19,7 +19,8 @@ enum class CustomErrorCodes(
     BRAND_NOT_FOUND(2000, "Brand not found"),
 
     // Category errors (2100 - 2199)
-    INVALID_CATEGORY(2100, "Invalid category name. Please use one of: ${Category.values().joinToString(", ") { it.name.lowercase() }}");
+    CATEGORY_NOT_FOUND(2100, "Category not found"),
+    INVALID_CATEGORY(2101, "Invalid category name. Please use one of: ${ProductCategory.values().joinToString(", ") { it.value.lowercase() }}");
 
     companion object {
         /**

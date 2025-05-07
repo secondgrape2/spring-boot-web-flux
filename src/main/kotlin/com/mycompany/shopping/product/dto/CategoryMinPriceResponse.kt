@@ -1,12 +1,12 @@
 package com.mycompany.shopping.product.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
-import com.mycompany.shopping.product.domain.enums.Category
+import com.mycompany.shopping.product.domain.enums.ProductCategory
 
 @Schema(description = "Information about a single category and the lowest priced product in that category")
 data class CategoryLowestPriceInfo(
     @Schema(description = "Category name", example = "top")
-    val category: Category,
+    val category: ProductCategory,
 
     @Schema(description = "Details of the lowest priced product within the category")
     val lowestProduct: LowestProductDetails

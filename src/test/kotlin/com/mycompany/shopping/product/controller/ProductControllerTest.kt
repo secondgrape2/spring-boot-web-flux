@@ -32,7 +32,7 @@ class ProductControllerTest {
             .expectBody(ErrorResponse::class.java)
             .consumeWith { result ->
                 val errorResponse = result.responseBody
-                assertEquals("E2100", errorResponse?.code)
+                assertEquals("E2101", errorResponse?.code)
                 assertEquals(400, errorResponse?.statusCode)
             }
 

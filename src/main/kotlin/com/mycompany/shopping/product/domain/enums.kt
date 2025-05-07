@@ -2,7 +2,7 @@ package com.mycompany.shopping.product.domain.enums
 
 import com.fasterxml.jackson.annotation.JsonValue
 
-enum class Category(@JsonValue val value: String) {
+enum class ProductCategory(@JsonValue val value: String) {
     TOP("top"),
     OUTER("outer"),
     PANTS("pants"),
@@ -13,7 +13,7 @@ enum class Category(@JsonValue val value: String) {
     ACCESSORY("accessory");
 
     companion object {
-        fun fromValue(value: String): Category? {
+        fun fromValue(value: String): ProductCategory? {
             return values().find { it.value == value }
         }
     }

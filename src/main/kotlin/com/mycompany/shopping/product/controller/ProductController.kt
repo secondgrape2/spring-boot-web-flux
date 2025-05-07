@@ -16,7 +16,7 @@ import org.springframework.web.server.ResponseStatusException
 import com.mycompany.shopping.common.exception.ErrorResponse
 import com.mycompany.shopping.product.dto.BrandLowestPriceResponse
 import com.mycompany.shopping.product.dto.CategoryPriceRangeResponse
-import com.mycompany.shopping.product.domain.enums.Category
+import com.mycompany.shopping.product.domain.enums.ProductCategory
 import io.swagger.v3.oas.annotations.Parameter
 import com.mycompany.shopping.product.exceptions.InvalidCategoryException
 import com.mycompany.shopping.product.dto.CreateProductRequest
@@ -138,7 +138,7 @@ class ProductController(private val productService: ProductService) {
         )
         @PathVariable category: String
     ): Mono<ResponseEntity<CategoryPriceRangeResponse>> {
-        val parsedCategory: Category = Category.fromValue(category)
+        val parsedCategory: ProductCategory = ProductCategory.fromValue(category)
             ?: throw InvalidCategoryException()
 
         return productService.getCategoryPriceRange(parsedCategory)
