@@ -1,8 +1,8 @@
 package com.mycompany.shopping.brand.service
 
-import com.mycompany.shopping.brand.dto.CreateBrandRequest
-import com.mycompany.shopping.brand.dto.UpdateBrandRequest
-import com.mycompany.shopping.brand.dto.BrandResponse
+import com.mycompany.shopping.brand.dto.BrandResponseDto
+import com.mycompany.shopping.brand.dto.CreateBrandRequestDto
+import com.mycompany.shopping.brand.dto.UpdateBrandRequestDto
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
@@ -15,7 +15,7 @@ interface BrandService {
      * @param request The brand creation request containing brand details
      * @return A Mono emitting the created brand response
      */
-    fun createBrand(request: CreateBrandRequest): Mono<BrandResponse>
+    fun createBrand(dto: CreateBrandRequestDto): Mono<BrandResponseDto>
     
     /**
      * Updates an existing brand.
@@ -23,10 +23,10 @@ interface BrandService {
      * @param request The brand update request containing updated brand details
      * @return A Mono emitting the updated brand response
      */
-    fun updateBrand(id: Long, request: UpdateBrandRequest): Mono<BrandResponse>
+    fun updateBrand(id: Long, dto: UpdateBrandRequestDto): Mono<BrandResponseDto>
     
     /**
-     * Deletes a brand by its ID.
+     * Soft deletes a brand by its ID.
      * @param id The ID of the brand to delete
      * @return A Mono completing when the deletion is done
      */

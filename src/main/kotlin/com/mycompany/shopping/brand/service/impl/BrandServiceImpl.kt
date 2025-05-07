@@ -1,43 +1,51 @@
 package com.mycompany.shopping.brand.service.impl
 
-import com.mycompany.shopping.brand.dto.BrandResponse
-import com.mycompany.shopping.brand.dto.CreateBrandRequest
-import com.mycompany.shopping.brand.dto.UpdateBrandRequest
+import com.mycompany.shopping.brand.interfaces.Brand
+import com.mycompany.shopping.brand.interfaces.BrandRequest
+import com.mycompany.shopping.brand.domain.BrandDomain
+import com.mycompany.shopping.brand.dto.BrandResponseDto
+import com.mycompany.shopping.brand.dto.CreateBrandRequestDto
+import com.mycompany.shopping.brand.dto.UpdateBrandRequestDto
+import com.mycompany.shopping.brand.repository.BrandRepository
 import com.mycompany.shopping.brand.service.BrandService
+import com.mycompany.shopping.common.exception.CustomErrorCodes
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.transaction.reactive.TransactionalOperator
 import reactor.core.publisher.Mono
-import java.time.LocalDateTime
+import java.time.Instant
 
 @Service
-class BrandServiceImpl() : BrandService {
+class BrandServiceImpl(
+    private val brandRepository: BrandRepository
+) : BrandService {
 
-    override fun createBrand(request: CreateBrandRequest): Mono<BrandResponse> {
-        // TODO: Implement createBrand
-        return Mono.just(
-            BrandResponse(
-                id = 1L,
-                name = request.name,
-                createdAt = LocalDateTime.now(),
-                updatedAt = LocalDateTime.now()
-            )
-        )
+    override fun createBrand(dto: CreateBrandRequestDto): Mono<BrandResponseDto> {
+        return brandRepository.create(dto)
+            .map { mapToBrandResponse(it) }
     }
 
-    override fun updateBrand(id: Long, request: UpdateBrandRequest): Mono<BrandResponse> {
-        // TODO: Implement updateBrand
-        return Mono.just(
-            BrandResponse(
-                id = id,
-                name = request.name,
-                createdAt = LocalDateTime.now(),
-                updatedAt = LocalDateTime.now()
-            )
+    override fun updateBrand(id: Long, dto: UpdateBrandRequestDto): Mono<BrandResponseDto> {
+        val brandDomain = BrandDomain(
+            id = id,
+            name = dto.name,
+            createdAt = Instant.now(),
+            updatedAt = Instant.now()
         )
+        return brandRepository.update(brandDomain)
+            .map { mapToBrandResponse(it) }
     }
 
     override fun deleteBrand(id: Long): Mono<Void> {
-        // TODO: Implement deleteBrand
-        return Mono.empty()
+        return brandRepository.softDelete(id)
+    }
+    
+    private fun mapToBrandResponse(brand: Brand): BrandResponseDto {
+        return BrandResponseDto(
+            id = brand.id,
+            name = brand.name,
+            createdAt = brand.createdAt,
+            updatedAt = brand.updatedAt
+        )
     }
 } 

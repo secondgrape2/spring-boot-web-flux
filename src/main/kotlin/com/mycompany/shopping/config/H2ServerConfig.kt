@@ -14,7 +14,7 @@ class H2ConsoleConfig {
 
     private val logger = LoggerFactory.getLogger(H2ConsoleConfig::class.java)
 
-    @Value("\${spring.h2.console.port}")
+    @Value("\${spring.h2.console.port:8090}")
     private lateinit var port: String
 
     private lateinit var webServer: Server
