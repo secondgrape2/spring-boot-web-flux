@@ -8,18 +8,18 @@ class CategoryTest {
     @Test
     fun `fromValue should return correct Category for valid value`() {
         val validValues = mapOf(
-            "top" to Category.TOP,
-            "outer" to Category.OUTER,
-            "pants" to Category.PANTS,
-            "sneakers" to Category.SNEAKERS,
-            "bag" to Category.BAG,
-            "hat" to Category.HAT,
-            "socks" to Category.SOCKS,
-            "accessory" to Category.ACCESSORY
+            "top" to ProductCategory.TOP,
+            "outer" to ProductCategory.OUTER,
+            "pants" to ProductCategory.PANTS,
+            "sneakers" to ProductCategory.SNEAKERS,
+            "bag" to ProductCategory.BAG,
+            "hat" to ProductCategory.HAT,
+            "socks" to ProductCategory.SOCKS,
+            "accessory" to ProductCategory.ACCESSORY
         )
 
         validValues.forEach { (value, expectedCategory) ->
-            val result = Category.fromValue(value)
+            val result = ProductCategory.fromValue(value)
             assertEquals(expectedCategory, result, "Should return $expectedCategory for value '$value'")
         }
     }
@@ -41,7 +41,7 @@ class CategoryTest {
         )
 
         invalidValues.forEach { value ->
-            val result = Category.fromValue(value)
+            val result = ProductCategory.fromValue(value)
             assertNull(result, "Should return null for invalid value '$value'")
         }
     }
@@ -60,7 +60,7 @@ class CategoryTest {
         )
 
         caseSensitiveValues.forEach { value ->
-            val result = Category.fromValue(value)
+            val result = ProductCategory.fromValue(value)
             assertNull(result, "Should return null for case-sensitive value '$value'")
         }
     }

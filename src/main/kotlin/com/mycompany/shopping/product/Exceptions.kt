@@ -3,10 +3,10 @@ package com.mycompany.shopping.product.exceptions
 import com.mycompany.shopping.common.exception.BaseHttpException
 import org.springframework.http.HttpStatus
 import com.mycompany.shopping.common.exception.CustomErrorCodes
-import com.mycompany.shopping.product.domain.enums.Category
+import com.mycompany.shopping.product.domain.enums.ProductCategory
 
 class InvalidCategoryException(
-    message: String = "Invalid category name. Please use one of: ${Category.values().joinToString(", ") { it.name.lowercase() }}"
+    message: String = "Invalid category name. Please use one of: ${ProductCategory.values().joinToString(", ") { it.value.lowercase() }}"
 ) : BaseHttpException(
     message = message,
     statusCode = HttpStatus.BAD_REQUEST,
