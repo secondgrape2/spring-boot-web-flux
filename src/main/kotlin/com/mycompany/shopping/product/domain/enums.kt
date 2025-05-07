@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonValue
 enum class ProductCategory {
     TOP,
     OUTER,
-    PANTS,
-    SNEAKERS,
+    BOTTOM,
+    SHOES,
     BAG,
     HAT,
     SOCKS,

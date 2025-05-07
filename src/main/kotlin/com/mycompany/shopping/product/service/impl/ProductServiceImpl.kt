@@ -17,7 +17,10 @@ import com.mycompany.shopping.brand.service.BrandService
 import com.mycompany.shopping.category.service.CategoryService
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
+import reactor.core.publisher.Flux
 import java.time.Instant
+import com.mycompany.shopping.product.interfaces.ProductWithBrand
+
 
 @Service
 class ProductServiceImpl(
@@ -27,71 +30,34 @@ class ProductServiceImpl(
     private val productMapper: ProductMapper
 ) : ProductService {
 
-    override fun getCategoryMinPricesWithTotalAmount(): Mono<CategoryMinPriceResponseDto> {
-        // Mock data for demonstration purposes
-        // TODO: Remove this mock data after implementing the actual data source
-        val mockCategories = listOf(
-            CategoryLowestPriceInfoDto(
-                category = ProductCategory.TOP,
-                lowestProduct = LowestProductDetailsDto(
-                    brand = BrandResponseDto(name = "A"),
-                    price = 11200
-                )
-            ),
-            CategoryLowestPriceInfoDto(
-                category = ProductCategory.OUTER,
-                lowestProduct = LowestProductDetailsDto(
-                    brand = BrandResponseDto(name = "E"),
-                    price = 5000
-                )
-            ),
-            CategoryLowestPriceInfoDto(
-                category = ProductCategory.PANTS,
-                lowestProduct = LowestProductDetailsDto(
-                    brand = BrandResponseDto(name = "D"),
-                    price = 3000
-                )
-            ),
-            CategoryLowestPriceInfoDto(
-                category = ProductCategory.SNEAKERS,
-                lowestProduct = LowestProductDetailsDto(
-                    brand = BrandResponseDto(name = "G"),
-                    price = 9000
-                )
-            ),
-            CategoryLowestPriceInfoDto(
-                category = ProductCategory.BAG,
-                lowestProduct = LowestProductDetailsDto(
-                    brand = BrandResponseDto(name = "A"),
-                    price = 2000
-                )
-            ),
-            CategoryLowestPriceInfoDto(
-                category = ProductCategory.HAT,
-                lowestProduct = LowestProductDetailsDto(
-                    brand = BrandResponseDto(name = "D"),
-                    price = 1500
-                )
-            ),
-            CategoryLowestPriceInfoDto(
-                category = ProductCategory.SOCKS,
-                lowestProduct = LowestProductDetailsDto(
-                    brand = BrandResponseDto(name = "I"),
-                    price = 1700
-                )
-            ),
-            CategoryLowestPriceInfoDto(
-                category = ProductCategory.ACCESSORY,
-                lowestProduct = LowestProductDetailsDto(
-                    brand = BrandResponseDto(name = "F"),
-                    price = 1900
-                )
+    private fun findCheapestProductsByCategory(): Flux<ProductWithBrand> {
+        return productRepository.findCheapestProductsByCategory()
+    }
+
+    internal fun mapToCategoryLowestPriceInfo(product: ProductWithBrand): CategoryLowestPriceInfoDto {
+        return CategoryLowestPriceInfoDto(
+            category = product.categoryName,
+            lowestProduct = LowestProductDetailsDto(
+                brand = BrandResponseDto(name = product.brand.name),
+                price = product.price
             )
         )
+    }
 
-        val totalLowestPrice = mockCategories.sumOf { it.lowestProduct.price }
+    internal fun calculateTotalLowestPrice(categoryLowestPriceInfo: List<CategoryLowestPriceInfoDto>): Long {
+        return categoryLowestPriceInfo.sumOf { it.lowestProduct.price }
+    }
 
-        return Mono.just(CategoryMinPriceResponseDto(mockCategories, totalLowestPrice))
+    override fun getCategoryMinPricesWithTotalAmount(): Mono<CategoryMinPriceResponseDto> {
+        return findCheapestProductsByCategory()
+            .map { product -> mapToCategoryLowestPriceInfo(product) }
+            .collectList()
+            .map { categoryLowestPriceInfo -> 
+                CategoryMinPriceResponseDto(
+                    categories = categoryLowestPriceInfo,
+                    totalLowestPrice = calculateTotalLowestPrice(categoryLowestPriceInfo)
+                )
+            }
     }
 
     override fun getBrandWithLowestTotalPrice(): Mono<BrandLowestPriceResponseDto> {
@@ -99,8 +65,8 @@ class ProductServiceImpl(
         val mockCategories = listOf(
             CategoryPriceInfoDto(ProductCategory.TOP, "10,100"),
             CategoryPriceInfoDto(ProductCategory.OUTER, "5,100"),
-            CategoryPriceInfoDto(ProductCategory.PANTS, "3,000"),
-            CategoryPriceInfoDto(ProductCategory.SNEAKERS, "9,500"),
+            CategoryPriceInfoDto(ProductCategory.BOTTOM, "3,000"),
+            CategoryPriceInfoDto(ProductCategory.SHOES, "9,500"),
             CategoryPriceInfoDto(ProductCategory.BAG, "2,500"),
             CategoryPriceInfoDto(ProductCategory.HAT, "1,500"),
             CategoryPriceInfoDto(ProductCategory.SOCKS, "2,400"),

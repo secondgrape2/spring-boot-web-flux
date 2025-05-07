@@ -1,6 +1,8 @@
 package com.mycompany.shopping.product.interfaces
 
 import java.time.Instant
+import com.mycompany.shopping.brand.interfaces.Brand
+import com.mycompany.shopping.product.domain.enums.ProductCategory
 
 /**
  * Interface representing a Product entity in the shopping system.
@@ -21,4 +23,16 @@ interface Product {
     val createdAt: Instant
     /** Timestamp when the product was last updated */
     val updatedAt: Instant
+}
+
+/**
+ * Interface representing a product with brand information.
+ * Extends the base Product interface with additional brand-related data.
+ */
+interface ProductWithBrand : Product {
+    /** Name of the associated brand */
+    val brand: Brand
+
+    /** Name of the associated category */
+    val categoryName: ProductCategory
 }
