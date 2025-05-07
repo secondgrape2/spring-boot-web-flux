@@ -4,6 +4,9 @@ import com.mycompany.shopping.product.interfaces.Product
 import com.mycompany.shopping.product.interfaces.ProductWithBrand
 import reactor.core.publisher.Mono
 import reactor.core.publisher.Flux
+import com.mycompany.shopping.product.domain.ProductDomain
+import com.mycompany.shopping.product.domain.enums.ProductCategory
+import com.mycompany.shopping.product.domain.MinMaxPriceProductWithBrandDomain
 
 /**
  * Repository interface for managing product data operations.
@@ -44,4 +47,11 @@ interface ProductRepository {
      * @return A Mono completing when the deletion is done
      */
     fun softDelete(id: Long): Mono<Void>
+
+    /**
+     * Finds the product with the minimum and maximum price for a given category ID.
+     * @param categoryId The ID of the category to find the min/max price product for
+     * @return A Mono emitting the product with the min/max price, or empty if not found
+     */
+    fun findMinMaxPriceProductsWithBrandByCategoryId(categoryId: Long): Mono<MinMaxPriceProductWithBrandDomain>
 } 

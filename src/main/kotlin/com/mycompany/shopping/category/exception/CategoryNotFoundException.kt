@@ -8,6 +8,6 @@ class CategoryNotFoundException(
     name: String
 ) : BaseHttpException(
     message = "Category not found with name: $name",
-    statusCode = HttpStatus.NOT_FOUND,
+    statusCode = HttpStatus.BAD_REQUEST,
     errorCode = CustomErrorCodes.CATEGORY_NOT_FOUND
 ) 

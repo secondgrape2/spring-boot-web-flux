@@ -27,3 +27,19 @@ data class ProductWithBrandDomain(
     override val brand: Brand,
     override val categoryName: ProductCategory
 ) : ProductWithBrand
+
+data class MinMaxPriceProductWithBrandQueryInfo(
+    val id: Long,
+    val name: String,
+    val price: Long,
+    val brandId: Long,
+    val createdAt: Instant,
+    val updatedAt: Instant,
+    val brand: Brand,
+)
+
+data class MinMaxPriceProductWithBrandDomain(
+    val categoryId: Long,
+    val minPriceProduct: MinMaxPriceProductWithBrandQueryInfo,
+    val maxPriceProduct: MinMaxPriceProductWithBrandQueryInfo
+)

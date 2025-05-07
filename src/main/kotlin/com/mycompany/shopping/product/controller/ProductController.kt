@@ -118,24 +118,19 @@ class ProductController(private val productService: ProductService) {
             )
         ]
     )
-    @GetMapping("/categories/{category}/price-range")
+    @GetMapping("/categories/{categoryId}/price-range")
     @ResponseStatus(HttpStatus.OK)
     fun getCategoryPriceRange(
         @Parameter(
-            name = "category",
-            description = "Category name. Must be one of: TOP, OUTER, BOTTOM, SHOES, BAG, HAT, SOCKS, ACCESSORY",
+            name = "categoryId",
+            description = "Category ID",
             required = true,
-            example = "TOP"
+            example = "1"
         )
-        @PathVariable category: String
+        @PathVariable categoryId: Long
     ): Mono<CategoryPriceRangeResponseDto> {
-        val parsedCategory: ProductCategory = try {
-            ProductCategory.valueOf(category)
-        } catch (e: IllegalArgumentException) {
-            throw InvalidCategoryException()
-        }
 
-        return productService.getCategoryPriceRange(parsedCategory)
+        return productService.getCategoryPriceRange(categoryId)
     }
 
     @Operation(

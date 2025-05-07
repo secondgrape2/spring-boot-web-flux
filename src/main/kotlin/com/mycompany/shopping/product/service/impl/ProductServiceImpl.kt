@@ -82,29 +82,25 @@ class ProductServiceImpl(
         return Mono.just(BrandLowestPriceResponseDto(brandLowestPriceInfo))
     }
 
-    override fun getCategoryPriceRange(category: ProductCategory): Mono<CategoryPriceRangeResponseDto> {
-        // TODO: Remove this mock data after implementing the actual data source
-        val mockLowestPrice = listOf(
-            BrandPriceInfoDto(
-                brand = "C",
-                price = "10,000"
-            )
-        )
-
-        val mockHighestPrice = listOf(
-            BrandPriceInfoDto(
-                brand = "I",
-                price = "11,400"
-            )
-        )
-
-        return Mono.just(
-            CategoryPriceRangeResponseDto(
-                category = category,
-                lowestPrice = mockLowestPrice,
-                highestPrice = mockHighestPrice
-            )
-        )
+    override fun getCategoryPriceRange(categoryId: Long): Mono<CategoryPriceRangeResponseDto> {
+        return categoryService.getCategoryById(categoryId)
+            .switchIfEmpty(Mono.error(CategoryNotFoundException()))
+            .flatMap { category -> 
+                productRepository.findMinMaxPriceProductsWithBrandByCategoryId(categoryId)
+                    .map { minMaxPriceProduct -> 
+                        CategoryPriceRangeResponseDto(
+                            category = category.name,
+                            lowestPrice = listOf(BrandPriceInfoDto(
+                                brand = minMaxPriceProduct.minPriceProduct.brand.name,
+                                price = minMaxPriceProduct.minPriceProduct.price.toString()
+                            )),
+                            highestPrice = listOf(BrandPriceInfoDto(
+                                brand = minMaxPriceProduct.maxPriceProduct.brand.name,
+                                price = minMaxPriceProduct.maxPriceProduct.price.toString()
+                            ))
+                        )
+                    }
+            }
     }
 
     override fun createProduct(request: CreateProductRequestDto): Mono<ProductResponseDto> {

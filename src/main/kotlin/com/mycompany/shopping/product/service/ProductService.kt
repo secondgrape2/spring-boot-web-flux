@@ -1,7 +1,6 @@
 package com.mycompany.shopping.product.service
 
 import com.mycompany.shopping.product.dto.*
-import com.mycompany.shopping.product.domain.enums.ProductCategory
 import reactor.core.publisher.Mono
 
 /**
@@ -30,7 +29,7 @@ interface ProductService {
      * @param category The category to search for
      * @return A Mono emitting [CategoryPriceRangeResponseDto] containing the lowest and highest priced products in the category
      */
-    fun getCategoryPriceRange(category: ProductCategory): Mono<CategoryPriceRangeResponseDto>
+    fun getCategoryPriceRange(categoryId: Long): Mono<CategoryPriceRangeResponseDto>
 
     /**
      * Creates a new product.
