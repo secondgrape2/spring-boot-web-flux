@@ -6,6 +6,7 @@ import org.junit.jupiter.api.assertThrows
 import java.time.Instant
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import com.mycompany.shopping.common.exception.InvalidFieldException
 
 class CategoryEntityTest {
 
@@ -32,7 +33,7 @@ class CategoryEntityTest {
     }
 
     @Test
-    fun `toDomain should throw IllegalStateException when id is null`() {
+    fun `toDomain should throw InvalidFieldException when id is null`() {
         // given
         val categoryEntity = CategoryEntity(
             id = null,
@@ -40,7 +41,7 @@ class CategoryEntityTest {
         )
 
         // when & then
-        assertThrows<IllegalStateException> {
+        assertThrows<InvalidFieldException> {
             categoryEntity.toDomain()
         }
     }

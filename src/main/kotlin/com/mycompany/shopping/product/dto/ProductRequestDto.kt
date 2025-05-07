@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Positive
 import io.swagger.v3.oas.annotations.media.Schema
 
-data class CreateProductRequest(
+data class CreateProductRequestDto(
     @Schema(description = "Product name")
     @NotBlank(message = "Product name is required")
     val name: String,
@@ -15,18 +15,16 @@ data class CreateProductRequest(
     @Positive(message = "Price must be greater than 0")
     val price: Long,
 
-    @Schema(description = "Brand ID")
-    @NotNull(message = "Brand ID is required")
-    @Positive(message = "Brand ID must be greater than 0")
+    @Schema(description = "Brand Id")
+    @NotNull(message = "Brand Id is required")
     val brandId: Long,
 
-    @Schema(description = "Category ID")
-    @NotNull(message = "Category ID is required")
-    @Positive(message = "Category ID must be greater than 0")
+    @Schema(description = "Category Id")
+    @NotNull(message = "Category Id is required")
     val categoryId: Long
 )
 
-data class UpdateProductRequest(
+data class UpdateProductRequestDto(
     @Schema(description = "Product name")
     @NotBlank(message = "Product name is required")
     val name: String,
@@ -36,13 +34,11 @@ data class UpdateProductRequest(
     @Positive(message = "Price must be greater than 0")
     val price: Long,
 
-    @Schema(description = "Brand ID")
-    @NotNull(message = "Brand ID is required")
-    @Positive(message = "Brand ID must be greater than 0")
+    @Schema(description = "Brand Id")
+    @NotNull(message = "Brand Id is required")
     val brandId: Long,
 
-    @Schema(description = "Category ID")
-    @NotNull(message = "Category ID is required")
-    @Positive(message = "Category ID must be greater than 0")
+    @Schema(description = "Category Id")
+    @NotNull(message = "Category Id is required")
     val categoryId: Long
 ) 

@@ -13,24 +13,24 @@ interface ProductService {
     /**
      * Retrieves the minimum price for each product category.
      *
-     * @return A Mono emitting [CategoryMinPriceResponse] objects, each representing the lowest priced product in a category.
+     * @return A Mono emitting [CategoryMinPriceResponseDto] objects, each representing the lowest priced product in a category.
      */
-    fun getCategoryMinPricesWithTotalAmount(): Mono<CategoryMinPriceResponse>
+    fun getCategoryMinPricesWithTotalAmount(): Mono<CategoryMinPriceResponseDto>
 
     /**
      * Retrieves the brand that offers the lowest total price across all categories.
      *
-     * @return A Mono emitting [BrandLowestPriceResponse] containing the brand with lowest total price and its products.
+     * @return A Mono emitting [BrandLowestPriceResponseDto] containing the brand with lowest total price and its products.
      */
-    fun getBrandWithLowestTotalPrice(): Mono<BrandLowestPriceResponse>
+    fun getBrandWithLowestTotalPrice(): Mono<BrandLowestPriceResponseDto>
 
     /**
      * Retrieves the lowest and highest priced brands and their products for a given category.
      *
      * @param category The category to search for
-     * @return A Mono emitting [CategoryPriceRangeResponse] containing the lowest and highest priced products in the category
+     * @return A Mono emitting [CategoryPriceRangeResponseDto] containing the lowest and highest priced products in the category
      */
-    fun getCategoryPriceRange(category: ProductCategory): Mono<CategoryPriceRangeResponse>
+    fun getCategoryPriceRange(category: ProductCategory): Mono<CategoryPriceRangeResponseDto>
 
     /**
      * Creates a new product.
@@ -38,7 +38,7 @@ interface ProductService {
      * @param request The request containing product details
      * @return A Mono emitting the created product response
      */
-    fun createProduct(request: CreateProductRequest): Mono<ProductResponse>
+    fun createProduct(request: CreateProductRequestDto): Mono<ProductResponseDto>
 
     /**
      * Updates an existing product.
@@ -47,7 +47,7 @@ interface ProductService {
      * @param request The request containing updated product details
      * @return A Mono emitting the updated product response
      */
-    fun updateProduct(id: Long, request: UpdateProductRequest): Mono<ProductResponse>
+    fun updateProduct(id: Long, request: UpdateProductRequestDto): Mono<ProductResponseDto>
 
     /**
      * Deletes a product by its ID.

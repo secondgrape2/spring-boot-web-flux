@@ -5,7 +5,7 @@ import com.mycompany.shopping.product.domain.enums.ProductCategory
 import java.time.Instant
 
 data class CategoryDomain(
-    override val id: Long,
+    override val id: Long?,
     override val name: ProductCategory,
     override val createdAt: Instant,
     override val updatedAt: Instant

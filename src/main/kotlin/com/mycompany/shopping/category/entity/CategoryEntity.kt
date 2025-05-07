@@ -8,6 +8,7 @@ import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Table
 import java.time.Instant
+import com.mycompany.shopping.common.exception.InvalidFieldException
 
 @Table("categories")
 data class CategoryEntity(
@@ -28,7 +29,7 @@ data class CategoryEntity(
     val deletedAt: Instant? = null
 ) {
     fun toDomain(): CategoryDomain = CategoryDomain(
-        id = id ?: throw IllegalStateException("Category ID cannot be null"),
+        id = id ?: throw InvalidFieldException("Category ID cannot be null"),
         name = name,
         createdAt = createdAt,
         updatedAt = updatedAt

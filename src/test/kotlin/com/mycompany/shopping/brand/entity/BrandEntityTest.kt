@@ -3,6 +3,7 @@ package com.mycompany.shopping.brand.entity
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
 import java.time.Instant
+import com.mycompany.shopping.common.exception.InvalidFieldException
 
 class BrandEntityTest {
 
@@ -29,7 +30,7 @@ class BrandEntityTest {
     }
 
     @Test
-    fun `toDomain should throw IllegalStateException when id is null`() {
+    fun `toDomain should throw InvalidFieldException when id is null`() {
         // given
         val brandEntity = BrandEntity(
             id = null,
@@ -37,7 +38,7 @@ class BrandEntityTest {
         )
 
         // when & then
-        assertThrows(IllegalStateException::class.java) {
+        assertThrows(InvalidFieldException::class.java) {
             brandEntity.toDomain()
         }
     }

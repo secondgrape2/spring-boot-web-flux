@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.reactive.TransactionalOperator
 import reactor.core.publisher.Mono
 import java.time.Instant
+import com.mycompany.shopping.common.exception.InvalidFieldException
 
 @Service
 class BrandServiceImpl(
@@ -39,10 +40,21 @@ class BrandServiceImpl(
     override fun deleteBrand(id: Long): Mono<Void> {
         return brandRepository.softDelete(id)
     }
+
+    override fun getBrandByName(name: String): Mono<BrandResponseDto> {
+        return brandRepository.findByName(name)
+            .map { mapToBrandResponse(it) }
+    }
     
+    override fun getBrandById(id: Long): Mono<BrandResponseDto> {
+        return brandRepository.findById(id)
+            .map { mapToBrandResponse(it) }
+    }
+
     private fun mapToBrandResponse(brand: Brand): BrandResponseDto {
+        val id = brand.id ?: throw InvalidFieldException("Brand ID is null")
         return BrandResponseDto(
-            id = brand.id,
+            id = id,
             name = brand.name,
             createdAt = brand.createdAt,
             updatedAt = brand.updatedAt

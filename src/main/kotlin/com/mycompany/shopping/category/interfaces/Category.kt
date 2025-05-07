@@ -9,7 +9,7 @@ import com.mycompany.shopping.product.domain.enums.ProductCategory
  */
 interface Category {
     /** Unique identifier for the category */
-    val id: Long
+    val id: Long?
     /** Name of the category */
     val name: ProductCategory
     /** Timestamp when the category was created */
