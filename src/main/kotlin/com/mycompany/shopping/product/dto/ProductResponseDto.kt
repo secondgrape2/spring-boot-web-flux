@@ -1,12 +1,12 @@
 package com.mycompany.shopping.product.dto
 
-import java.time.LocalDateTime
+import java.time.Instant
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Positive
 
-data class ProductResponse(
+data class ProductResponseDto(
     @Schema(description = "Product ID")
     @NotBlank(message = "Product ID is required")
     val id: Long,
@@ -32,9 +32,9 @@ data class ProductResponse(
 
     @Schema(description = "Created at")
     @NotNull(message = "Created at is required")
-    val createdAt: LocalDateTime,
+    val createdAt: Instant,
 
     @Schema(description = "Updated at")
     @NotNull(message = "Updated at is required")
-    val updatedAt: LocalDateTime
+    val updatedAt: Instant
 ) 

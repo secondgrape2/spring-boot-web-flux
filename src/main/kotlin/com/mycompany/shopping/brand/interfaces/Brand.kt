@@ -7,7 +7,7 @@ import java.time.Instant
  */
 interface Brand {
     /** Unique identifier for the brand */
-    val id: Long
+    val id: Long?
     /** Name of the brand */
     val name: String
     /** Timestamp when the brand was created */

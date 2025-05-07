@@ -24,4 +24,10 @@ class CategoryServiceImpl(
             .map { CategoryMapper.toResponseDto(it) }
             .switchIfEmpty(Mono.error(CategoryNotFoundException(name)))
     }
+
+    override fun getCategoryById(id: Long): Mono<CategoryResponseDto> {
+        return categoryRepository.findById(id)
+            .map { CategoryMapper.toResponseDto(it) }
+            .switchIfEmpty(Mono.error(CategoryNotFoundException(id.toString())))
+    }
 }

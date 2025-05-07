@@ -4,7 +4,6 @@ import com.mycompany.shopping.product.service.ProductService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import reactor.core.publisher.Mono
-import com.mycompany.shopping.product.dto.CategoryMinPriceResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import io.swagger.v3.oas.annotations.responses.ApiResponse
@@ -14,14 +13,12 @@ import io.swagger.v3.oas.annotations.media.Schema
 import org.springframework.http.HttpStatus
 import org.springframework.web.server.ResponseStatusException
 import com.mycompany.shopping.common.exception.ErrorResponse
-import com.mycompany.shopping.product.dto.BrandLowestPriceResponse
-import com.mycompany.shopping.product.dto.CategoryPriceRangeResponse
+import com.mycompany.shopping.product.dto.BrandLowestPriceResponseDto
+import com.mycompany.shopping.product.dto.CategoryPriceRangeResponseDto
 import com.mycompany.shopping.product.domain.enums.ProductCategory
 import io.swagger.v3.oas.annotations.Parameter
 import com.mycompany.shopping.product.exceptions.InvalidCategoryException
-import com.mycompany.shopping.product.dto.CreateProductRequest
-import com.mycompany.shopping.product.dto.UpdateProductRequest
-import com.mycompany.shopping.product.dto.ProductResponse
+import com.mycompany.shopping.product.dto.*
 
 @RestController
 @RequestMapping("/api/v1/products")
@@ -39,7 +36,7 @@ class ProductController(private val productService: ProductService) {
                 description = "Successfully retrieved category minimum prices",
                 content = [Content(
                     mediaType = "application/json",
-                    schema = Schema(implementation = CategoryMinPriceResponse::class)
+                    schema = Schema(implementation = CategoryMinPriceResponseDto::class)
                 )]
             ),
             ApiResponse(
@@ -54,12 +51,9 @@ class ProductController(private val productService: ProductService) {
     )
     @GetMapping("/categories/minimum-prices")
     @ResponseStatus(HttpStatus.OK)
-    fun getCategoryMinPrices(): Mono<ResponseEntity<CategoryMinPriceResponse>> {
+    fun getCategoryMinPrices(): Mono<CategoryMinPriceResponseDto> {
         val minPricesResponse = productService.getCategoryMinPricesWithTotalAmount()
         return minPricesResponse
-            .map { response ->
-                ResponseEntity.ok(response)
-            }
     }
 
     @Operation(
@@ -73,7 +67,7 @@ class ProductController(private val productService: ProductService) {
                 description = "Successfully retrieved brand with lowest total price",
                 content = [Content(
                     mediaType = "application/json",
-                    schema = Schema(implementation = BrandLowestPriceResponse::class)
+                    schema = Schema(implementation = BrandLowestPriceResponseDto::class)
                 )]
             ),
             ApiResponse(
@@ -88,11 +82,8 @@ class ProductController(private val productService: ProductService) {
     )
     @GetMapping("/brands/lowest-total-price")
     @ResponseStatus(HttpStatus.OK)
-    fun getBrandWithLowestTotalPrice(): Mono<ResponseEntity<BrandLowestPriceResponse>> {
+    fun getBrandWithLowestTotalPrice(): Mono<BrandLowestPriceResponseDto> {
         return productService.getBrandWithLowestTotalPrice()
-            .map { response ->
-                ResponseEntity.ok(response)
-            }
     }
 
     @Operation(
@@ -106,7 +97,7 @@ class ProductController(private val productService: ProductService) {
                 description = "Successfully retrieved category price range",
                 content = [Content(
                     mediaType = "application/json",
-                    schema = Schema(implementation = CategoryPriceRangeResponse::class)
+                    schema = Schema(implementation = CategoryPriceRangeResponseDto::class)
                 )]
             ),
             ApiResponse(
@@ -132,19 +123,19 @@ class ProductController(private val productService: ProductService) {
     fun getCategoryPriceRange(
         @Parameter(
             name = "category",
-            description = "Category name. Must be one of: top, outer, pants, sneakers, bag, hat, socks, accessory",
+            description = "Category name. Must be one of: TOP, OUTER, BOTTOM, SHOES, BAG, HAT, SOCKS, ACCESSORY",
             required = true,
-            example = "top"
+            example = "TOP"
         )
         @PathVariable category: String
-    ): Mono<ResponseEntity<CategoryPriceRangeResponse>> {
-        val parsedCategory: ProductCategory = ProductCategory.fromValue(category)
-            ?: throw InvalidCategoryException()
+    ): Mono<CategoryPriceRangeResponseDto> {
+        val parsedCategory: ProductCategory = try {
+            ProductCategory.valueOf(category)
+        } catch (e: IllegalArgumentException) {
+            throw InvalidCategoryException()
+        }
 
         return productService.getCategoryPriceRange(parsedCategory)
-            .map { response ->
-                ResponseEntity.ok(response)
-            }
     }
 
     @Operation(
@@ -153,8 +144,8 @@ class ProductController(private val productService: ProductService) {
     )
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    fun createProduct(@RequestBody request: CreateProductRequest): Mono<ProductResponse> {
-        return productService.createProduct(request)
+    fun createProduct(@RequestBody dto: CreateProductRequestDto): Mono<ProductResponseDto> {
+        return productService.createProduct(dto)
     }
 
     @Operation(
@@ -165,9 +156,9 @@ class ProductController(private val productService: ProductService) {
     @ResponseStatus(HttpStatus.OK)
     fun updateProduct(
         @PathVariable productId: Long,
-        @RequestBody request: UpdateProductRequest
-    ): Mono<ProductResponse> {
-        return productService.updateProduct(productId, request)
+        @RequestBody dto: UpdateProductRequestDto
+    ): Mono<ProductResponseDto> {
+        return productService.updateProduct(productId, dto)
     }
 
     @Operation(

@@ -3,70 +3,87 @@ package com.mycompany.shopping.product.service.impl
 import com.mycompany.shopping.product.dto.*
 import com.mycompany.shopping.product.domain.enums.ProductCategory
 import com.mycompany.shopping.product.service.ProductService
+import com.mycompany.shopping.product.repository.ProductRepository
+import com.mycompany.shopping.brand.repository.BrandRepository
+import com.mycompany.shopping.category.repository.CategoryRepository
+import com.mycompany.shopping.product.domain.ProductDomain
+import com.mycompany.shopping.brand.BrandNotFoundException
+import com.mycompany.shopping.category.exceptions.CategoryNotFoundException
+import com.mycompany.shopping.product.exceptions.ProductNotFoundException
+import com.mycompany.shopping.product.interfaces.Product
+import com.mycompany.shopping.common.exception.CustomErrorCodes
+import com.mycompany.shopping.product.mapper.ProductMapper
+import com.mycompany.shopping.brand.service.BrandService
+import com.mycompany.shopping.category.service.CategoryService
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
-import java.time.LocalDateTime
+import java.time.Instant
 
 @Service
-class ProductServiceImpl : ProductService {
+class ProductServiceImpl(
+    private val productRepository: ProductRepository,
+    private val brandService: BrandService,
+    private val categoryService: CategoryService,
+    private val productMapper: ProductMapper
+) : ProductService {
 
-    override fun getCategoryMinPricesWithTotalAmount(): Mono<CategoryMinPriceResponse> {
+    override fun getCategoryMinPricesWithTotalAmount(): Mono<CategoryMinPriceResponseDto> {
         // Mock data for demonstration purposes
         // TODO: Remove this mock data after implementing the actual data source
         val mockCategories = listOf(
-            CategoryLowestPriceInfo(
+            CategoryLowestPriceInfoDto(
                 category = ProductCategory.TOP,
-                lowestProduct = LowestProductDetails(
-                    brand = Brand(name = "A"),
+                lowestProduct = LowestProductDetailsDto(
+                    brand = BrandResponseDto(name = "A"),
                     price = 11200
                 )
             ),
-            CategoryLowestPriceInfo(
+            CategoryLowestPriceInfoDto(
                 category = ProductCategory.OUTER,
-                lowestProduct = LowestProductDetails(
-                    brand = Brand(name = "E"),
+                lowestProduct = LowestProductDetailsDto(
+                    brand = BrandResponseDto(name = "E"),
                     price = 5000
                 )
             ),
-            CategoryLowestPriceInfo(
+            CategoryLowestPriceInfoDto(
                 category = ProductCategory.PANTS,
-                lowestProduct = LowestProductDetails(
-                    brand = Brand(name = "D"),
+                lowestProduct = LowestProductDetailsDto(
+                    brand = BrandResponseDto(name = "D"),
                     price = 3000
                 )
             ),
-            CategoryLowestPriceInfo(
+            CategoryLowestPriceInfoDto(
                 category = ProductCategory.SNEAKERS,
-                lowestProduct = LowestProductDetails(
-                    brand = Brand(name = "G"),
+                lowestProduct = LowestProductDetailsDto(
+                    brand = BrandResponseDto(name = "G"),
                     price = 9000
                 )
             ),
-            CategoryLowestPriceInfo(
+            CategoryLowestPriceInfoDto(
                 category = ProductCategory.BAG,
-                lowestProduct = LowestProductDetails(
-                    brand = Brand(name = "A"),
+                lowestProduct = LowestProductDetailsDto(
+                    brand = BrandResponseDto(name = "A"),
                     price = 2000
                 )
             ),
-            CategoryLowestPriceInfo(
+            CategoryLowestPriceInfoDto(
                 category = ProductCategory.HAT,
-                lowestProduct = LowestProductDetails(
-                    brand = Brand(name = "D"),
+                lowestProduct = LowestProductDetailsDto(
+                    brand = BrandResponseDto(name = "D"),
                     price = 1500
                 )
             ),
-            CategoryLowestPriceInfo(
+            CategoryLowestPriceInfoDto(
                 category = ProductCategory.SOCKS,
-                lowestProduct = LowestProductDetails(
-                    brand = Brand(name = "I"),
+                lowestProduct = LowestProductDetailsDto(
+                    brand = BrandResponseDto(name = "I"),
                     price = 1700
                 )
             ),
-            CategoryLowestPriceInfo(
+            CategoryLowestPriceInfoDto(
                 category = ProductCategory.ACCESSORY,
-                lowestProduct = LowestProductDetails(
-                    brand = Brand(name = "F"),
+                lowestProduct = LowestProductDetailsDto(
+                    brand = BrandResponseDto(name = "F"),
                     price = 1900
                 )
             )
@@ -74,49 +91,49 @@ class ProductServiceImpl : ProductService {
 
         val totalLowestPrice = mockCategories.sumOf { it.lowestProduct.price }
 
-        return Mono.just(CategoryMinPriceResponse(mockCategories, totalLowestPrice))
+        return Mono.just(CategoryMinPriceResponseDto(mockCategories, totalLowestPrice))
     }
 
-    override fun getBrandWithLowestTotalPrice(): Mono<BrandLowestPriceResponse> {
+    override fun getBrandWithLowestTotalPrice(): Mono<BrandLowestPriceResponseDto> {
         // TODO: Remove this mock data after implementing the actual data source
         val mockCategories = listOf(
-            CategoryPriceInfo(ProductCategory.TOP, "10,100"),
-            CategoryPriceInfo(ProductCategory.OUTER, "5,100"),
-            CategoryPriceInfo(ProductCategory.PANTS, "3,000"),
-            CategoryPriceInfo(ProductCategory.SNEAKERS, "9,500"),
-            CategoryPriceInfo(ProductCategory.BAG, "2,500"),
-            CategoryPriceInfo(ProductCategory.HAT, "1,500"),
-            CategoryPriceInfo(ProductCategory.SOCKS, "2,400"),
-            CategoryPriceInfo(ProductCategory.ACCESSORY, "2,000")
+            CategoryPriceInfoDto(ProductCategory.TOP, "10,100"),
+            CategoryPriceInfoDto(ProductCategory.OUTER, "5,100"),
+            CategoryPriceInfoDto(ProductCategory.PANTS, "3,000"),
+            CategoryPriceInfoDto(ProductCategory.SNEAKERS, "9,500"),
+            CategoryPriceInfoDto(ProductCategory.BAG, "2,500"),
+            CategoryPriceInfoDto(ProductCategory.HAT, "1,500"),
+            CategoryPriceInfoDto(ProductCategory.SOCKS, "2,400"),
+            CategoryPriceInfoDto(ProductCategory.ACCESSORY, "2,000")
         )
 
-        val brandLowestPriceInfo = BrandLowestPriceInfo(
+        val brandLowestPriceInfo = BrandLowestPriceInfoDto(
             brand = "D",
             categories = mockCategories,
             totalPrice = "36,100"
         )
 
-        return Mono.just(BrandLowestPriceResponse(brandLowestPriceInfo))
+        return Mono.just(BrandLowestPriceResponseDto(brandLowestPriceInfo))
     }
 
-    override fun getCategoryPriceRange(category: ProductCategory): Mono<CategoryPriceRangeResponse> {
+    override fun getCategoryPriceRange(category: ProductCategory): Mono<CategoryPriceRangeResponseDto> {
         // TODO: Remove this mock data after implementing the actual data source
         val mockLowestPrice = listOf(
-            BrandPriceInfo(
+            BrandPriceInfoDto(
                 brand = "C",
                 price = "10,000"
             )
         )
 
         val mockHighestPrice = listOf(
-            BrandPriceInfo(
+            BrandPriceInfoDto(
                 brand = "I",
                 price = "11,400"
             )
         )
 
         return Mono.just(
-            CategoryPriceRangeResponse(
+            CategoryPriceRangeResponseDto(
                 category = category,
                 lowestPrice = mockLowestPrice,
                 highestPrice = mockHighestPrice
@@ -124,34 +141,63 @@ class ProductServiceImpl : ProductService {
         )
     }
 
-    override fun createProduct(request: CreateProductRequest): Mono<ProductResponse> {
-        // TODO: Implement createProduct
-        return Mono.just(ProductResponse(
-            id = 1, 
-            name = request.name, 
-            price = request.price, 
-            brandId = request.brandId, 
-            categoryId = request.categoryId,
-            createdAt = LocalDateTime.now(),
-            updatedAt = LocalDateTime.now()
-        ))
+    override fun createProduct(request: CreateProductRequestDto): Mono<ProductResponseDto> {
+        return Mono.zip(
+            brandService.getBrandById(request.brandId),
+            categoryService.getCategoryById(request.categoryId)
+        )
+        .map { tuple -> 
+            val brandResponseDto = tuple.t1 
+            val categoryResponseDto = tuple.t2 
+
+            val productDomain = ProductDomain(
+                id = null,
+                name = request.name,
+                price = request.price,
+                brandId = brandResponseDto.id,
+                categoryId = categoryResponseDto.id,
+                createdAt = Instant.now(),
+                updatedAt = Instant.now()
+            )
+            productDomain
+        }
+        .flatMap { productDomain -> 
+            productRepository.create(productDomain)
+        }
+        .map { product -> 
+                productMapper.toResponse(product)
+            }
     }
 
-    override fun updateProduct(id: Long, request: UpdateProductRequest): Mono<ProductResponse> {
-        // TODO: Implement updateProduct
-        return Mono.just(ProductResponse(
-            id = id, 
-            name = request.name, 
-            price = request.price, 
-            brandId = request.brandId, 
-            categoryId = request.categoryId,
-            createdAt = LocalDateTime.now(),
-            updatedAt = LocalDateTime.now()
-        ))
+    override fun updateProduct(id: Long, request: UpdateProductRequestDto): Mono<ProductResponseDto> {
+        return productRepository.findById(id)
+            .switchIfEmpty(Mono.error(ProductNotFoundException()))
+            .flatMap { existingProduct ->
+                Mono.zip(
+                    brandService.getBrandById(request.brandId),
+                    categoryService.getCategoryById(request.categoryId)
+                ).flatMap { tuple ->
+                    val brandResponseDto = tuple.t1
+                    val categoryResponseDto = tuple.t2
+                    
+                    val productDomain = ProductDomain(
+                        id = existingProduct.id,
+                        name = request.name,
+                        price = request.price,
+                        brandId = brandResponseDto.id,
+                        categoryId = categoryResponseDto.id,
+                        createdAt = existingProduct.createdAt,
+                        updatedAt = Instant.now()
+                    )
+                    productRepository.update(productDomain)
+                }
+            }
+            .map { productMapper.toResponse(it) }
     }
 
     override fun deleteProduct(id: Long): Mono<Void> {
-        // TODO: Implement deleteProduct
-        return Mono.empty()
+        return productRepository.findById(id)
+            .switchIfEmpty(Mono.error(ProductNotFoundException()))
+            .flatMap { productRepository.softDelete(id) }
     }
 } 

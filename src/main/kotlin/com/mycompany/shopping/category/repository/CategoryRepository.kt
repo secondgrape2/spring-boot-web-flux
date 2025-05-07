@@ -21,4 +21,11 @@ interface CategoryRepository {
      * @return A Mono emitting the found category, or empty if not found
      */
     fun findByName(name: String): Mono<Category>
+
+    /**
+     * Finds a category by its ID.
+     * @param id The ID of the category to find
+     * @return A Mono emitting the found category, or empty if not found
+     */
+    fun findById(id: Long): Mono<Category>
 } 

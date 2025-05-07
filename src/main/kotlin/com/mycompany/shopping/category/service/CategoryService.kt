@@ -20,4 +20,11 @@ interface CategoryService {
      * @return A Mono emitting the category response
      */
     fun getCategoryByName(name: String): Mono<CategoryResponseDto>
+
+    /**
+     * Retrieves a category by its ID.
+     * @param id The ID of the category to retrieve
+     * @return A Mono emitting the category response
+     */
+    fun getCategoryById(id: Long): Mono<CategoryResponseDto>
 } 

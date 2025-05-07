@@ -6,7 +6,7 @@ import com.mycompany.shopping.common.exception.CustomErrorCodes
 import com.mycompany.shopping.product.domain.enums.ProductCategory
 
 class InvalidCategoryException(
-    message: String = "Invalid category name. Please use one of: ${ProductCategory.values().joinToString(", ") { it.value.lowercase() }}"
+    message: String = "Invalid category name. Please use one of: ${ProductCategory.values().joinToString(", ") { it.name }}"
 ) : BaseHttpException(
     message = message,
     statusCode = HttpStatus.BAD_REQUEST,

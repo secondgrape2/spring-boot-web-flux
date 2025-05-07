@@ -4,13 +4,13 @@ import io.swagger.v3.oas.annotations.media.Schema
 import com.mycompany.shopping.product.domain.enums.ProductCategory
 
 @Schema(description = "Response for the lowest priced brand across all categories")
-data class BrandLowestPriceResponse(
+data class BrandLowestPriceResponseDto(
     @Schema(description = "Information about the lowest priced brand")
-    val lowestPriceInfo: BrandLowestPriceInfo
+    val lowestPriceInfo: BrandLowestPriceInfoDto
 )
 
 @Schema(description = "Information about a product in a specific category")
-data class CategoryPriceInfo(
+data class CategoryPriceInfoDto(
     @Schema(description = "Category name", example = "top")
     val category: ProductCategory,
 
@@ -19,12 +19,12 @@ data class CategoryPriceInfo(
 )
 
 @Schema(description = "Information about the lowest priced brand and its products")
-data class BrandLowestPriceInfo(
+data class BrandLowestPriceInfoDto(
     @Schema(description = "Brand name", example = "D")
     val brand: String,
 
     @Schema(description = "List of products by category with their prices")
-    val categories: List<CategoryPriceInfo>,
+    val categories: List<CategoryPriceInfoDto>,
 
     @Schema(description = "Total price for all products", example = "36,100")
     val totalPrice: String

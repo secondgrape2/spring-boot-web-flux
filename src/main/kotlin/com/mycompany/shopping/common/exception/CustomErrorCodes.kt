@@ -20,7 +20,13 @@ enum class CustomErrorCodes(
 
     // Category errors (2100 - 2199)
     CATEGORY_NOT_FOUND(2100, "Category not found"),
-    INVALID_CATEGORY(2101, "Invalid category name. Please use one of: ${ProductCategory.values().joinToString(", ") { it.value.lowercase() }}");
+    INVALID_CATEGORY(2101, "Invalid category name. Please use one of: ${ProductCategory.values().joinToString(", ") { it.name }}"),
+
+    // Product errors (2200 - 2299)
+    PRODUCT_NOT_FOUND(2200, "Product not found"),
+
+    // Service errors (9000 - 9999)
+    INVALID_FIELD(9000, "Invalid field value.");
 
     companion object {
         /**

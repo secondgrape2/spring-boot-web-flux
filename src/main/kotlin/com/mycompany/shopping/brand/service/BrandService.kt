@@ -31,4 +31,18 @@ interface BrandService {
      * @return A Mono completing when the deletion is done
      */
     fun deleteBrand(id: Long): Mono<Void>
+
+    /**
+     * Retrieves a brand by its name.
+     * @param name The name of the brand to retrieve
+     * @return A Mono emitting the brand response
+     */
+    fun getBrandByName(name: String): Mono<BrandResponseDto>
+
+    /**
+     * Retrieves a brand by its ID.
+     * @param id The ID of the brand to retrieve
+     * @return A Mono emitting the brand response
+     */
+    fun getBrandById(id: Long): Mono<BrandResponseDto>
 } 

@@ -29,4 +29,9 @@ class CategoryRepositoryR2dbcImpl(
         return categoryR2dbcRepository.findByName(name)
             .map { it.toDomain() }
     }
+
+    override fun findById(id: Long): Mono<Category> {
+        return categoryR2dbcRepository.findById(id)
+            .map { it.toDomain() }
+    }
 } 

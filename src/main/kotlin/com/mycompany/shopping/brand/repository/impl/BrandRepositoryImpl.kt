@@ -18,6 +18,9 @@ interface BrandR2dbcRepository : ReactiveCrudRepository<BrandEntity, Long> {
     @Modifying
     @Query("UPDATE brands SET deleted_at = :deletedAt, updated_at = :updatedAt WHERE id = :id AND deleted_at IS NULL")
     fun markAsDeleted(id: Long, deletedAt: Instant, updatedAt: Instant): Mono<Integer>
+
+    @Query("SELECT * FROM brands WHERE name = :name AND deleted_at IS NULL")
+    fun findByName(name: String): Mono<BrandEntity>
 }
 
 @Repository("brandRepository")
@@ -34,9 +37,9 @@ class BrandRepositoryR2dbcImpl(
 
         return savedBrand.map { it.toDomain() }
     }
-
     override fun update(brand: Brand): Mono<Brand> {
-        return brandR2dbcRepository.findById(brand.id)
+        val id = brand.id ?: return Mono.error(IllegalArgumentException("Brand ID cannot be null"))
+        return brandR2dbcRepository.findById(id)
                 .filter { it.deletedAt == null }
                 .flatMap { brandEntity ->
                     val updatedEntity = brandEntity.copy(
@@ -49,6 +52,12 @@ class BrandRepositoryR2dbcImpl(
 
     override fun findById(id: Long): Mono<Brand> {
         return brandR2dbcRepository.findById(id)
+                .filter { it.deletedAt == null }
+                .map { it.toDomain() }
+    }
+
+    override fun findByName(name: String): Mono<Brand> {
+        return brandR2dbcRepository.findByName(name)
                 .filter { it.deletedAt == null }
                 .map { it.toDomain() }
     }

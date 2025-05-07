@@ -30,6 +30,13 @@ interface BrandRepository {
      * @return A Mono emitting the found brand, or empty if not found
      */
     fun findById(id: Long): Mono<Brand>
+
+    /**
+     * Finds a brand by its name.
+     * @param name The name of the brand to find
+     * @return A Mono emitting the found brand, or empty if not found
+     */
+    fun findByName(name: String): Mono<Brand>
     
     /**
      * Performs a soft delete of a brand by its ID.
