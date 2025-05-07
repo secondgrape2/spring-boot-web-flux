@@ -32,9 +32,8 @@ CREATE TABLE products (
 );
 
 -- Indexes for products table
-CREATE INDEX idx_products_category_id ON products(category_id);
 CREATE INDEX idx_products_brand_id ON products(brand_id);
-CREATE INDEX idx_products_price ON products(price);
+CREATE INDEX idx_products_category_price ON products(category_id, price);
 CREATE INDEX idx_products_deleted_at ON products(deleted_at);
 
 -- Indexes for categories table

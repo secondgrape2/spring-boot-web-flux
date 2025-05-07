@@ -1,7 +1,9 @@
 package com.mycompany.shopping.product.repository
 
 import com.mycompany.shopping.product.interfaces.Product
+import com.mycompany.shopping.product.interfaces.ProductWithBrand
 import reactor.core.publisher.Mono
+import reactor.core.publisher.Flux
 
 /**
  * Repository interface for managing product data operations.
@@ -28,6 +30,13 @@ interface ProductRepository {
      * @return A Mono emitting the found product, or empty if not found
      */
     fun findById(id: Long): Mono<Product>
+    
+    /**
+     * Finds the cheapest product by category ID.
+     * @param categoryId The ID of the category to find the cheapest product for
+     * @return A Mono emitting the cheapest product, or empty if not found
+     */
+    fun findCheapestProductsByCategory(): Flux<ProductWithBrand>
     
     /**
      * Performs a soft delete of a product by its ID.

@@ -5,7 +5,7 @@ import com.mycompany.shopping.product.domain.enums.ProductCategory
 
 @Schema(description = "Information about a single category and the lowest priced product in that category")
 data class CategoryLowestPriceInfoDto(
-    @Schema(description = "Category name", example = "top")
+    @Schema(description = "Category name", example = "TOP")
     val category: ProductCategory,
 
     @Schema(description = "Details of the lowest priced product within the category")
@@ -23,7 +23,7 @@ data class CategoryMinPriceResponseDto(
     val categories: List<CategoryLowestPriceInfoDto>,
 
     @Schema(description = "Total sum of all lowest priced products across categories")
-    val totalLowestPrice: Int
+    val totalLowestPrice: Long
 )
 
 @Schema(description = "Details of the lowest priced product")
@@ -32,7 +32,7 @@ data class LowestProductDetailsDto(
     val brand: BrandResponseDto,
 
     @Schema(description = "Price", example = "10000")
-    val price: Int,
+    val price: Long,
 
     // TODO: Add product details later
 )
