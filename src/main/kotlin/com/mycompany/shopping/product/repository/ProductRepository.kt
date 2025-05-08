@@ -54,4 +54,11 @@ interface ProductRepository {
      * @return A Mono emitting the product with the min/max price, or empty if not found
      */
     fun findMinMaxPriceProductsWithBrandByCategoryId(categoryId: Long): Mono<MinMaxPriceProductWithBrandDomain>
+
+    /**
+     * Calculates the sum of the minimum prices for all categories for a specific brand.
+     * @param brandId The ID of the brand to calculate the sum for
+     * @return A Mono emitting the sum of the minimum prices for all categories of the specified brand
+     */
+    fun calculateMinPriceSumByCategoryForBrand(brandId: Long): Mono<Long>
 } 

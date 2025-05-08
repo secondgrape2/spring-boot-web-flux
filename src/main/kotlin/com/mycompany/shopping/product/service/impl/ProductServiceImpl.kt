@@ -21,87 +21,23 @@ import reactor.core.publisher.Mono
 import reactor.core.publisher.Flux
 import java.time.Instant
 import com.mycompany.shopping.product.interfaces.ProductWithBrand
+import com.mycompany.shopping.product.infrastructures.ProductEventPublisher
+import com.mycompany.shopping.product.event.ProductEvent
+import org.slf4j.LoggerFactory
+import com.mycompany.shopping.product.domain.MinMaxPriceProductWithBrandDomain
 
 @Service
 class ProductServiceImpl(
     private val productRepository: ProductRepository,
+    private val productMapper: ProductMapper,
+    private val eventPublisher: ProductEventPublisher,
     private val brandService: BrandService,
-    private val categoryService: CategoryService,
-    private val productMapper: ProductMapper
+    private val categoryService: CategoryService
 ) : ProductService {
+    private val logger = LoggerFactory.getLogger(ProductServiceImpl::class.java)
 
-    private fun findCheapestProductsByCategory(): Flux<ProductWithBrand> {
+    override fun findCheapestProductsByCategory(): Flux<ProductWithBrand> {
         return productRepository.findCheapestProductsByCategory()
-    }
-
-    internal fun mapToCategoryLowestPriceInfo(product: ProductWithBrand): CategoryLowestPriceInfoDto {
-        return CategoryLowestPriceInfoDto(
-            category = product.categoryName.getLocalizedName("ko"),
-            lowestProduct = LowestProductDetailsDto(
-                brand = BrandResponseDto(name = product.brand.name),
-                price = PriceFormatter.format(product.price)
-            )
-        )
-    }
-
-    internal fun calculateTotalLowestPrice(categoryLowestPriceInfo: List<CategoryLowestPriceInfoDto>): String {
-        val total = categoryLowestPriceInfo.sumOf { it.lowestProduct.price.replace(",", "").toLong() }
-        return PriceFormatter.format(total)
-    }
-
-    override fun getCategoryMinPricesWithTotalAmount(): Mono<CategoryMinPriceResponseDto> {
-        return findCheapestProductsByCategory()
-            .map { product -> mapToCategoryLowestPriceInfo(product) }
-            .collectList()
-            .map { categoryLowestPriceInfo -> 
-                CategoryMinPriceResponseDto(
-                    categories = categoryLowestPriceInfo,
-                    totalLowestPrice = calculateTotalLowestPrice(categoryLowestPriceInfo)
-                )
-            }
-    }
-
-    override fun getBrandWithLowestTotalPrice(): Mono<BrandLowestPriceResponseDto> {
-        // TODO: Remove this mock data after implementing the actual data source
-        val mockCategories = listOf(
-            CategoryPriceInfoDto(ProductCategory.TOP.getLocalizedName("ko"), "10,100"),
-            CategoryPriceInfoDto(ProductCategory.OUTER.getLocalizedName("ko"), "5,100"),
-            CategoryPriceInfoDto(ProductCategory.BOTTOM.getLocalizedName("ko"), "3,000"),
-            CategoryPriceInfoDto(ProductCategory.SHOES.getLocalizedName("ko"), "9,500"),
-            CategoryPriceInfoDto(ProductCategory.BAG.getLocalizedName("ko"), "2,500"),
-            CategoryPriceInfoDto(ProductCategory.HAT.getLocalizedName("ko"), "1,500"),
-            CategoryPriceInfoDto(ProductCategory.SOCKS.getLocalizedName("ko"), "2,400"),
-            CategoryPriceInfoDto(ProductCategory.ACCESSORY.getLocalizedName("ko"), "2,000")
-        )
-
-        val brandLowestPriceInfo = BrandLowestPriceInfoDto(
-            brand = "D",
-            categories = mockCategories,
-            totalPrice = "36,100"
-        )
-
-        return Mono.just(BrandLowestPriceResponseDto(brandLowestPriceInfo))
-    }
-
-    override fun getCategoryPriceRange(categoryId: Long): Mono<CategoryPriceRangeResponseDto> {
-        return categoryService.getCategoryById(categoryId)
-            .switchIfEmpty(Mono.error(CategoryNotFoundException()))
-            .flatMap { category -> 
-                productRepository.findMinMaxPriceProductsWithBrandByCategoryId(categoryId)
-                    .map { minMaxPriceProduct -> 
-                        CategoryPriceRangeResponseDto(
-                            category = category.name.getLocalizedName("ko"),
-                            lowestPrice = listOf(BrandPriceInfoDto(
-                                brand = minMaxPriceProduct.minPriceProduct.brand.name,
-                                price = PriceFormatter.format(minMaxPriceProduct.minPriceProduct.price)
-                            )),
-                            highestPrice = listOf(BrandPriceInfoDto(
-                                brand = minMaxPriceProduct.maxPriceProduct.brand.name,
-                                price = PriceFormatter.format(minMaxPriceProduct.maxPriceProduct.price)
-                            ))
-                        )
-                    }
-            }
     }
 
     override fun createProduct(request: CreateProductRequestDto): Mono<ProductResponseDto> {
@@ -109,7 +45,7 @@ class ProductServiceImpl(
             brandService.getBrandById(request.brandId),
             categoryService.getCategoryById(request.categoryId)
         )
-        .map { tuple -> 
+        .flatMap { tuple -> 
             val brandResponseDto = tuple.t1 
             val categoryResponseDto = tuple.t2 
 
@@ -122,9 +58,12 @@ class ProductServiceImpl(
                 createdAt = Instant.now(),
                 updatedAt = Instant.now()
             )
-            productDomain
+            productRepository.create(productDomain)
         }
-        .flatMap { productDomain -> productRepository.create(productDomain) }
+        .flatMap { savedProduct ->
+            eventPublisher.publish(ProductEvent(product = savedProduct, eventType = ProductEvent.EventType.CREATED))
+                .thenReturn(savedProduct)
+        }
         .map { product -> productMapper.toResponseDto(product) }
     }
 
@@ -151,12 +90,31 @@ class ProductServiceImpl(
                     productRepository.update(productDomain)
                 }
             }
+            .flatMap { updatedProduct ->
+                eventPublisher.publish(ProductEvent(product = updatedProduct, eventType = ProductEvent.EventType.UPDATED))
+                    .thenReturn(updatedProduct)
+            }
             .map { product -> productMapper.toResponseDto(product) }
     }
 
     override fun deleteProduct(id: Long): Mono<Void> {
         return productRepository.findById(id)
             .switchIfEmpty(Mono.error(ProductNotFoundException()))
-            .flatMap { product -> productRepository.softDelete(id) }
+            .flatMap { product ->
+                productRepository.softDelete(id)
+                    .then(Mono.just(product))
+            }
+            .doOnSuccess { product ->
+                eventPublisher.publish(ProductEvent(product = product, eventType = ProductEvent.EventType.DELETED))
+            }
+            .then()
+    }
+
+    override fun findMinMaxPriceProductsWithBrandByCategoryId(categoryId: Long): Mono<MinMaxPriceProductWithBrandDomain> {
+        return productRepository.findMinMaxPriceProductsWithBrandByCategoryId(categoryId)
+    }
+
+    override fun calculateMinPriceSumByCategoryForBrand(brandId: Long): Mono<Long> {
+        return productRepository.calculateMinPriceSumByCategoryForBrand(brandId)
     }
 } 
