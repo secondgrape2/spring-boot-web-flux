@@ -60,7 +60,7 @@ class ProductServiceImplTest {
         // then
         assert(result.category == ProductCategory.TOP.getLocalizedName("ko"))
         assert(result.lowestProduct.brand.name == "Test Brand")
-        assert(result.lowestProduct.price == 10000L)
+        assert(result.lowestProduct.price == "10,000")
     }
 
     @Test
@@ -71,14 +71,14 @@ class ProductServiceImplTest {
                 category = ProductCategory.TOP.getLocalizedName("ko"),
                 lowestProduct = LowestProductDetailsDto(
                     brand = BrandResponseDto(name = "Brand1"),
-                    price = 10000
+                    price = "10,000"
                 )
             ),
             CategoryLowestPriceInfoDto(
                 category = ProductCategory.BOTTOM.getLocalizedName("ko"),
                 lowestProduct = LowestProductDetailsDto(
                     brand = BrandResponseDto(name = "Brand2"),
-                    price = 20000
+                    price = "20,000"
                 )
             )
         )
@@ -87,7 +87,7 @@ class ProductServiceImplTest {
         val result = productService.calculateTotalLowestPrice(categoryLowestPriceInfo)
 
         // then
-        assert(result == 30000L)
+        assert(result == "30,000")
     }
 
     @Test
@@ -130,13 +130,13 @@ class ProductServiceImplTest {
         StepVerifier.create(result)
             .expectNextMatches { response ->
                 response.categories.size == 2 &&
-                response.totalLowestPrice == 30000L &&
+                response.totalLowestPrice == "30,000" &&
                 response.categories[0].category == ProductCategory.TOP.getLocalizedName("ko") &&
                 response.categories[0].lowestProduct.brand.name == "Brand1" &&
-                response.categories[0].lowestProduct.price == 10000L &&
+                response.categories[0].lowestProduct.price == "10,000" &&
                 response.categories[1].category == ProductCategory.BOTTOM.getLocalizedName("ko") &&
                 response.categories[1].lowestProduct.brand.name == "Brand2" &&
-                response.categories[1].lowestProduct.price == 20000L
+                response.categories[1].lowestProduct.price == "20,000"
             }
             .verifyComplete()
     }

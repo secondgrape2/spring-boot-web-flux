@@ -25,7 +25,7 @@ class ProductMapperTest {
         }
 
         // when
-        val result = productMapper.toResponse(product)
+        val result = productMapper.toResponseDto(product)
 
         // then
         assertNotNull(result)
@@ -54,7 +54,7 @@ class ProductMapperTest {
         }
 
         // when
-        val result = productMapper.toResponse(product)
+        val result = productMapper.toResponseDto(product)
 
         // then
         assertNotNull(result)

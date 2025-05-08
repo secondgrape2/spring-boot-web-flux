@@ -7,7 +7,7 @@ import com.mycompany.shopping.common.exception.InvalidFieldException
 
 @Component
 class ProductMapper {
-    fun toResponse(product: Product): ProductResponseDto {
+    fun toResponseDto(product: Product): ProductResponseDto {
         val id = product.id ?: throw InvalidFieldException("Product ID is null")
         return ProductResponseDto(
             id = id,
