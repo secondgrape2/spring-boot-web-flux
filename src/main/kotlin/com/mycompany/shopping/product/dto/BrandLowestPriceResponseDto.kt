@@ -11,8 +11,8 @@ data class BrandLowestPriceResponseDto(
 
 @Schema(description = "Information about a product in a specific category")
 data class CategoryPriceInfoDto(
-    @Schema(description = "Category name", example = "top")
-    val category: ProductCategory,
+    @Schema(description = "Category name", example = "상의")
+    val category: String,
 
     @Schema(description = "Formatted price", example = "10,100")
     val price: String

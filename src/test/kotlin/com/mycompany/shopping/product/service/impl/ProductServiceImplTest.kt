@@ -51,14 +51,14 @@ class ProductServiceImplTest {
             createdAt = Instant.now(),
             updatedAt = Instant.now(),
             brand = brand,
-            categoryName = ProductCategory.TOP
+            categoryName = ProductCategory.valueOf("TOP")
         )
 
         // when
         val result = productService.mapToCategoryLowestPriceInfo(product)
 
         // then
-        assert(result.category == ProductCategory.TOP)
+        assert(result.category == ProductCategory.TOP.getLocalizedName("ko"))
         assert(result.lowestProduct.brand.name == "Test Brand")
         assert(result.lowestProduct.price == 10000L)
     }
@@ -68,14 +68,14 @@ class ProductServiceImplTest {
         // given
         val categoryLowestPriceInfo = listOf(
             CategoryLowestPriceInfoDto(
-                category = ProductCategory.TOP,
+                category = ProductCategory.TOP.getLocalizedName("ko"),
                 lowestProduct = LowestProductDetailsDto(
                     brand = BrandResponseDto(name = "Brand1"),
                     price = 10000
                 )
             ),
             CategoryLowestPriceInfoDto(
-                category = ProductCategory.BOTTOM,
+                category = ProductCategory.BOTTOM.getLocalizedName("ko"),
                 lowestProduct = LowestProductDetailsDto(
                     brand = BrandResponseDto(name = "Brand2"),
                     price = 20000
@@ -131,10 +131,10 @@ class ProductServiceImplTest {
             .expectNextMatches { response ->
                 response.categories.size == 2 &&
                 response.totalLowestPrice == 30000L &&
-                response.categories[0].category == ProductCategory.TOP &&
+                response.categories[0].category == ProductCategory.TOP.getLocalizedName("ko") &&
                 response.categories[0].lowestProduct.brand.name == "Brand1" &&
                 response.categories[0].lowestProduct.price == 10000L &&
-                response.categories[1].category == ProductCategory.BOTTOM &&
+                response.categories[1].category == ProductCategory.BOTTOM.getLocalizedName("ko") &&
                 response.categories[1].lowestProduct.brand.name == "Brand2" &&
                 response.categories[1].lowestProduct.price == 20000L
             }

@@ -87,3 +87,7 @@ API 문서는 Swagger를 사용하여 작성되었습니다.
 - brand api는 브랜드 추가, 수정, 삭제를 할 수 있습니다.
 - product api는 상품 추가, 수정, 삭제를 할 수 있습니다.
 - 삭제는 soft delete를 사용하였습니다.
+
+### 7. Localization
+- category name을 한국어로 반환하도록 구현하였습니다.
+- 추후 다른 언어로 반환할 경우 추가 구현 필요
