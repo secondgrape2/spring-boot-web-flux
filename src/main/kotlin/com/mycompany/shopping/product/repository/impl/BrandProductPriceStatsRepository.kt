@@ -18,6 +18,13 @@ interface BrandProductPriceStatsR2dbcRepository : ReactiveCrudRepository<BrandPr
      */
     @Query("SELECT * FROM brand_product_price_stats WHERE brand_id = :brandId")
     fun findByBrandId(brandId: Long): Mono<BrandProductPriceStatsEntity>
+
+    /**
+     * Find brand product total min price stats by total min price
+     * @return the brand product total min price stats entity
+     */
+    @Query("SELECT * FROM brand_product_price_stats ORDER BY total_min_price ASC LIMIT 1")
+    fun findByTotalMinPriceStats(): Mono<BrandProductPriceStatsEntity>
 } 
 
 @Repository
@@ -31,12 +38,18 @@ class BrandProductPriceStatsRepositoryR2dbcImpl(
 
     override fun save(brandProductPriceStats: BrandProductPriceStats): Mono<BrandProductPriceStats> {
         val brandProductPriceStatsEntity = BrandProductPriceStatsEntity(
+            id = brandProductPriceStats.id,
             brandId = brandProductPriceStats.brandId,
             totalMinPrice = brandProductPriceStats.totalMinPrice,
             createdAt = brandProductPriceStats.createdAt,
             updatedAt = brandProductPriceStats.updatedAt
         )
         return repository.save(brandProductPriceStatsEntity)
+            .map { it.toDomain() }
+    }
+
+    override fun findByTotalMinPriceBrandStats(): Mono<BrandProductPriceStats> {
+        return repository.findByTotalMinPriceStats()
             .map { it.toDomain() }
     }
 }

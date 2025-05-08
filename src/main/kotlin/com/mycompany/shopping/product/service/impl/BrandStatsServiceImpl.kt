@@ -8,8 +8,10 @@ import reactor.core.publisher.Mono
 import com.mycompany.shopping.product.infrastructures.ProductEventSubscriber
 import com.mycompany.shopping.product.event.ProductEvent
 import org.slf4j.LoggerFactory
-import com.mycompany.shopping.product.domain.BrandProductPriceStatsDomain
 import java.time.Instant
+import com.mycompany.shopping.product.interfaces.BrandProductPriceStats
+import com.mycompany.shopping.product.domain.BrandProductPriceStatsDomain
+
 @Service
 class BrandStatsServiceImpl(
     private val statsRepository: BrandProductPriceStatsRepository,
@@ -24,6 +26,10 @@ class BrandStatsServiceImpl(
                 updateBrandStats(event.product.brandId)
                 .subscribe()
             }
+    }
+
+    override fun getMinTotalPriceBrandStats(): Mono<BrandProductPriceStats> {
+        return statsRepository.findByTotalMinPriceBrandStats()
     }
 
     override fun updateBrandStats(brandId: Long): Mono<Void> {

@@ -8,4 +8,5 @@ import com.mycompany.shopping.product.interfaces.BrandProductPriceStats
 interface BrandProductPriceStatsRepository {
     fun findByBrandId(brandId: Long): Mono<BrandProductPriceStats>
     fun save(brandProductPriceStats: BrandProductPriceStats): Mono<BrandProductPriceStats>
+    fun findByTotalMinPriceBrandStats(): Mono<BrandProductPriceStats>
 } 

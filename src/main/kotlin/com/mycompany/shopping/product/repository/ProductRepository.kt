@@ -61,4 +61,11 @@ interface ProductRepository {
      * @return A Mono emitting the sum of the minimum prices for all categories of the specified brand
      */
     fun calculateMinPriceSumByCategoryForBrand(brandId: Long): Mono<Long>
+
+    /**
+     * Finds the cheapest products by brand ID.
+     * @param brandId The ID of the brand to find the cheapest products for
+     * @return A Flux emitting the cheapest products, or empty if not found
+     */
+    fun findCheapestProductsByBrandId(brandId: Long): Flux<ProductWithBrand>
 } 

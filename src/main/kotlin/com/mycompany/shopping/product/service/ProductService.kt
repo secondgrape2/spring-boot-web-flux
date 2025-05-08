@@ -59,4 +59,12 @@ interface ProductService {
      * @return A Mono emitting the calculated minimum price sum
      */
     fun calculateMinPriceSumByCategoryForBrand(brandId: Long): Mono<Long>
+
+    /**
+     * Retrieves the cheapest products by brand ID.
+     *
+     * @param brandId The ID of the brand to find the cheapest products for
+     * @return A Flux emitting [ProductWithBrand] objects, each representing the cheapest product in a brand.
+     */
+    fun findCheapestProductsByBrandId(brandId: Long): Flux<ProductWithBrand>
 }
