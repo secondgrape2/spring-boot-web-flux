@@ -5,8 +5,8 @@ import com.mycompany.shopping.product.domain.enums.ProductCategory
 
 @Schema(description = "Response for the price range of products in a category")
 data class CategoryPriceRangeResponseDto(
-    @Schema(description = "Category name", example = "top")
-    val category: ProductCategory,
+    @Schema(description = "Category name", example = "상의")
+    val category: String,
 
     @Schema(description = "List of lowest priced products")
     val lowestPrice: List<BrandPriceInfoDto>,

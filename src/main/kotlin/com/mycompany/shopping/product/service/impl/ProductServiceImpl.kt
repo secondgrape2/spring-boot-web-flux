@@ -36,7 +36,7 @@ class ProductServiceImpl(
 
     internal fun mapToCategoryLowestPriceInfo(product: ProductWithBrand): CategoryLowestPriceInfoDto {
         return CategoryLowestPriceInfoDto(
-            category = product.categoryName,
+            category = product.categoryName.getLocalizedName("ko"),
             lowestProduct = LowestProductDetailsDto(
                 brand = BrandResponseDto(name = product.brand.name),
                 price = product.price
@@ -63,14 +63,14 @@ class ProductServiceImpl(
     override fun getBrandWithLowestTotalPrice(): Mono<BrandLowestPriceResponseDto> {
         // TODO: Remove this mock data after implementing the actual data source
         val mockCategories = listOf(
-            CategoryPriceInfoDto(ProductCategory.TOP, "10,100"),
-            CategoryPriceInfoDto(ProductCategory.OUTER, "5,100"),
-            CategoryPriceInfoDto(ProductCategory.BOTTOM, "3,000"),
-            CategoryPriceInfoDto(ProductCategory.SHOES, "9,500"),
-            CategoryPriceInfoDto(ProductCategory.BAG, "2,500"),
-            CategoryPriceInfoDto(ProductCategory.HAT, "1,500"),
-            CategoryPriceInfoDto(ProductCategory.SOCKS, "2,400"),
-            CategoryPriceInfoDto(ProductCategory.ACCESSORY, "2,000")
+            CategoryPriceInfoDto(ProductCategory.TOP.getLocalizedName("ko"), "10,100"),
+            CategoryPriceInfoDto(ProductCategory.OUTER.getLocalizedName("ko"), "5,100"),
+            CategoryPriceInfoDto(ProductCategory.BOTTOM.getLocalizedName("ko"), "3,000"),
+            CategoryPriceInfoDto(ProductCategory.SHOES.getLocalizedName("ko"), "9,500"),
+            CategoryPriceInfoDto(ProductCategory.BAG.getLocalizedName("ko"), "2,500"),
+            CategoryPriceInfoDto(ProductCategory.HAT.getLocalizedName("ko"), "1,500"),
+            CategoryPriceInfoDto(ProductCategory.SOCKS.getLocalizedName("ko"), "2,400"),
+            CategoryPriceInfoDto(ProductCategory.ACCESSORY.getLocalizedName("ko"), "2,000")
         )
 
         val brandLowestPriceInfo = BrandLowestPriceInfoDto(
@@ -89,7 +89,7 @@ class ProductServiceImpl(
                 productRepository.findMinMaxPriceProductsWithBrandByCategoryId(categoryId)
                     .map { minMaxPriceProduct -> 
                         CategoryPriceRangeResponseDto(
-                            category = category.name,
+                            category = category.name.getLocalizedName("ko"),
                             lowestPrice = listOf(BrandPriceInfoDto(
                                 brand = minMaxPriceProduct.minPriceProduct.brand.name,
                                 price = minMaxPriceProduct.minPriceProduct.price.toString()
