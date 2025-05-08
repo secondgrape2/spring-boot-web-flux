@@ -23,7 +23,7 @@ data class CategoryMinPriceResponseDto(
     val categories: List<CategoryLowestPriceInfoDto>,
 
     @Schema(description = "Total sum of all lowest priced products across categories")
-    val totalLowestPrice: Long
+    val totalLowestPrice: String
 )
 
 @Schema(description = "Details of the lowest priced product")
@@ -31,6 +31,6 @@ data class LowestProductDetailsDto(
     @Schema(description = "Brand information")
     val brand: BrandResponseDto,
 
-    @Schema(description = "Price", example = "10000")
-    val price: Long
+    @Schema(description = "Formatted price", example = "10,000")
+    val price: String
 )

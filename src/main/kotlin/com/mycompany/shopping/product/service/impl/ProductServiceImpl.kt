@@ -15,12 +15,12 @@ import com.mycompany.shopping.common.exception.CustomErrorCodes
 import com.mycompany.shopping.product.mapper.ProductMapper
 import com.mycompany.shopping.brand.service.BrandService
 import com.mycompany.shopping.category.service.CategoryService
+import com.mycompany.shopping.common.util.PriceFormatter
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
 import reactor.core.publisher.Flux
 import java.time.Instant
 import com.mycompany.shopping.product.interfaces.ProductWithBrand
-
 
 @Service
 class ProductServiceImpl(
@@ -39,13 +39,14 @@ class ProductServiceImpl(
             category = product.categoryName.getLocalizedName("ko"),
             lowestProduct = LowestProductDetailsDto(
                 brand = BrandResponseDto(name = product.brand.name),
-                price = product.price
+                price = PriceFormatter.format(product.price)
             )
         )
     }
 
-    internal fun calculateTotalLowestPrice(categoryLowestPriceInfo: List<CategoryLowestPriceInfoDto>): Long {
-        return categoryLowestPriceInfo.sumOf { it.lowestProduct.price }
+    internal fun calculateTotalLowestPrice(categoryLowestPriceInfo: List<CategoryLowestPriceInfoDto>): String {
+        val total = categoryLowestPriceInfo.sumOf { it.lowestProduct.price.replace(",", "").toLong() }
+        return PriceFormatter.format(total)
     }
 
     override fun getCategoryMinPricesWithTotalAmount(): Mono<CategoryMinPriceResponseDto> {
@@ -92,11 +93,11 @@ class ProductServiceImpl(
                             category = category.name.getLocalizedName("ko"),
                             lowestPrice = listOf(BrandPriceInfoDto(
                                 brand = minMaxPriceProduct.minPriceProduct.brand.name,
-                                price = minMaxPriceProduct.minPriceProduct.price.toString()
+                                price = PriceFormatter.format(minMaxPriceProduct.minPriceProduct.price)
                             )),
                             highestPrice = listOf(BrandPriceInfoDto(
                                 brand = minMaxPriceProduct.maxPriceProduct.brand.name,
-                                price = minMaxPriceProduct.maxPriceProduct.price.toString()
+                                price = PriceFormatter.format(minMaxPriceProduct.maxPriceProduct.price)
                             ))
                         )
                     }
@@ -123,12 +124,8 @@ class ProductServiceImpl(
             )
             productDomain
         }
-        .flatMap { productDomain -> 
-            productRepository.create(productDomain)
-        }
-        .map { product -> 
-                productMapper.toResponse(product)
-            }
+        .flatMap { productDomain -> productRepository.create(productDomain) }
+        .map { product -> productMapper.toResponseDto(product) }
     }
 
     override fun updateProduct(id: Long, request: UpdateProductRequestDto): Mono<ProductResponseDto> {
@@ -154,12 +151,12 @@ class ProductServiceImpl(
                     productRepository.update(productDomain)
                 }
             }
-            .map { productMapper.toResponse(it) }
+            .map { product -> productMapper.toResponseDto(product) }
     }
 
     override fun deleteProduct(id: Long): Mono<Void> {
         return productRepository.findById(id)
             .switchIfEmpty(Mono.error(ProductNotFoundException()))
-            .flatMap { productRepository.softDelete(id) }
+            .flatMap { product -> productRepository.softDelete(id) }
     }
 } 
