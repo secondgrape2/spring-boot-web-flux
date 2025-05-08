@@ -117,4 +117,8 @@ class ProductServiceImpl(
     override fun calculateMinPriceSumByCategoryForBrand(brandId: Long): Mono<Long> {
         return productRepository.calculateMinPriceSumByCategoryForBrand(brandId)
     }
+
+    override fun findCheapestProductsByBrandId(brandId: Long): Flux<ProductWithBrand> {
+        return productRepository.findCheapestProductsByBrandId(brandId)
+    }
 } 

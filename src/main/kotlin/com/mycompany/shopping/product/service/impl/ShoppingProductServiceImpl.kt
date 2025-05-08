@@ -63,30 +63,25 @@ class ShoppingProductServiceImpl(
     }
 
     override fun getBrandWithLowestTotalPrice(): Mono<BrandLowestPriceResponseDto> {
+        return brandStatsService.getMinTotalPriceBrandStats()
+            .flatMap { brandStats ->
+                productService.findCheapestProductsByBrandId(brandStats.brandId)
+                    .collectList()
+                    .map { products ->
+                        BrandLowestPriceInfoDto(
+                            brand = products.first().brand.name,
+                            categories = products.map { product ->
+                                CategoryPriceInfoDto(product.categoryName.getLocalizedName("ko"), PriceFormatter.format(product.price))
+                            },
+                            totalPrice = PriceFormatter.format(products.sumOf { product -> product.price })
+                        )
+                    }
+            }
+            .switchIfEmpty(Mono.error(BrandNotFoundException()))
+            .map { brandLowestPriceInfo ->
+                BrandLowestPriceResponseDto(brandLowestPriceInfo)
+            }
 
-        // 가장 price 작은 brand 가져오기
-        // 해당 brand 의 모든 카테고리의 product 가져오기
-
-        // 해당 brand 의 모든 카테고리의 product 의 price 합계 계산
-
-        val mockCategories = listOf(
-            CategoryPriceInfoDto(ProductCategory.TOP.getLocalizedName("ko"), "10,100"),
-            CategoryPriceInfoDto(ProductCategory.OUTER.getLocalizedName("ko"), "5,100"),
-            CategoryPriceInfoDto(ProductCategory.BOTTOM.getLocalizedName("ko"), "3,000"),
-            CategoryPriceInfoDto(ProductCategory.SHOES.getLocalizedName("ko"), "9,500"),
-            CategoryPriceInfoDto(ProductCategory.BAG.getLocalizedName("ko"), "2,500"),
-            CategoryPriceInfoDto(ProductCategory.HAT.getLocalizedName("ko"), "1,500"),
-            CategoryPriceInfoDto(ProductCategory.SOCKS.getLocalizedName("ko"), "2,400"),
-            CategoryPriceInfoDto(ProductCategory.ACCESSORY.getLocalizedName("ko"), "2,000")
-        )
-
-        val brandLowestPriceInfo = BrandLowestPriceInfoDto(
-            brand = "D",
-            categories = mockCategories,
-            totalPrice = "36,100"
-        )
-
-        return Mono.just(BrandLowestPriceResponseDto(brandLowestPriceInfo))
     }
 
     override fun getCategoryPriceRange(categoryId: Long): Mono<CategoryPriceRangeResponseDto> {
