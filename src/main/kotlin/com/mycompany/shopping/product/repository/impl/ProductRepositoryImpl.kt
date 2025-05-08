@@ -17,7 +17,7 @@ import com.mycompany.shopping.brand.domain.BrandDomain
 import com.mycompany.shopping.product.repository.impl.CheapestProductByCategoryQueryResult
 import com.mycompany.shopping.product.domain.MinMaxPriceProductWithBrandDomain
 import com.mycompany.shopping.product.domain.MinMaxPriceProductWithBrandQueryInfo
-
+import com.mycompany.shopping.product.domain.ProductDomain
 
 @Repository
 interface ProductR2dbcRepository : ReactiveCrudRepository<ProductEntity, Long> {
@@ -84,6 +84,24 @@ interface ProductR2dbcRepository : ReactiveCrudRepository<ProductEntity, Long> {
          ORDER BY p.price DESC LIMIT 1)
     """)
     fun findMinMaxPriceProductsWithBrandByCategoryId(categoryId: Long): Flux<MinMaxPriceProductWithBrandQueryResult>
+
+    @Query("""
+        SELECT SUM(p.price)
+        FROM products p
+        WHERE p.brand_id = :brandId AND p.deleted_at IS NULL
+        AND NOT EXISTS (
+            SELECT 1
+            FROM products p2
+            WHERE p2.category_id = p.category_id
+            AND p2.brand_id = p.brand_id
+            AND p2.deleted_at IS NULL
+            AND (
+                p2.price < p.price OR
+                (p2.price = p.price AND p2.id < p.id)
+            )
+        )
+        """)
+    fun calculateMinPriceSumByCategoryForBrand(brandId: Long): Mono<Long>
 }
 
 @Repository("productRepository")
@@ -189,5 +207,9 @@ class ProductRepositoryR2dbcImpl(
                     )
                 )
             }
+    }
+
+    override fun calculateMinPriceSumByCategoryForBrand(brandId: Long): Mono<Long> {
+        return productR2dbcRepository.calculateMinPriceSumByCategoryForBrand(brandId)
     }
 } 

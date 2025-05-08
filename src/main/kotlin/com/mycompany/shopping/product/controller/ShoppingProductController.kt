@@ -19,11 +19,15 @@ import com.mycompany.shopping.product.domain.enums.ProductCategory
 import io.swagger.v3.oas.annotations.Parameter
 import com.mycompany.shopping.product.exceptions.InvalidCategoryException
 import com.mycompany.shopping.product.dto.*
+import com.mycompany.shopping.product.service.ShoppingProductService
 
 @RestController
 @RequestMapping("/api/v1/products")
 @Tag(name = "Product", description = "Product management APIs")
-class ProductController(private val productService: ProductService) {
+class ShoppingProductController(
+    private val shoppingProductService: ShoppingProductService,
+    private val productService: ProductService
+) {
 
     @Operation(
         summary = "Get minimum prices by category",
@@ -52,7 +56,7 @@ class ProductController(private val productService: ProductService) {
     @GetMapping("/categories/minimum-prices")
     @ResponseStatus(HttpStatus.OK)
     fun getCategoryMinPrices(): Mono<CategoryMinPriceResponseDto> {
-        val minPricesResponse = productService.getCategoryMinPricesWithTotalAmount()
+        val minPricesResponse = shoppingProductService.getCategoryMinPricesWithTotalAmount()
         return minPricesResponse
     }
 
@@ -83,7 +87,7 @@ class ProductController(private val productService: ProductService) {
     @GetMapping("/brands/lowest-total-price")
     @ResponseStatus(HttpStatus.OK)
     fun getBrandWithLowestTotalPrice(): Mono<BrandLowestPriceResponseDto> {
-        return productService.getBrandWithLowestTotalPrice()
+        return shoppingProductService.getBrandWithLowestTotalPrice()
     }
 
     @Operation(
@@ -130,7 +134,7 @@ class ProductController(private val productService: ProductService) {
         @PathVariable categoryId: Long
     ): Mono<CategoryPriceRangeResponseDto> {
 
-        return productService.getCategoryPriceRange(categoryId)
+        return shoppingProductService.getCategoryPriceRange(categoryId)
     }
 
     @Operation(
