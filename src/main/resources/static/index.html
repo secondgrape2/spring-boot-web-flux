@@ -5,37 +5,89 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shopping API Demo</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
+            margin: 0;
+            padding: 10px;
+            background-color: #f5f5f5;
         }
         .container {
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+        .header {
             text-align: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: white;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .result-container {
+            background-color: white;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 8px 12px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .result-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            margin: 0;
+        }
+        .toggle-icon {
+            font-size: 16px;
+            color: #666;
+        }
+        .result-content {
+            padding: 10px;
+            display: none;
+        }
+        .result-content.show {
+            display: block;
         }
         .button-group {
-            margin: 20px 0;
+            margin: 5px 0;
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
         }
         button {
-            padding: 10px 20px;
-            font-size: 16px;
+            padding: 4px 8px;
+            font-size: 13px;
             cursor: pointer;
             background-color: #4CAF50;
             color: white;
             border: none;
             border-radius: 4px;
-            margin: 5px;
+            transition: background-color 0.3s;
         }
         button:hover {
             background-color: #45a049;
         }
         #serverStatus {
-            margin-top: 20px;
-            padding: 10px;
+            margin: 5px 0;
+            padding: 5px;
             border-radius: 4px;
             font-weight: bold;
+            font-size: 14px;
         }
         .status-up {
             background-color: #dff0d8;
@@ -45,105 +97,214 @@
             background-color: #f2dede;
             color: #a94442;
         }
-        .result-container {
-            margin-top: 20px;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            text-align: left;
+        .table-responsive {
+            margin-top: 5px;
         }
-        .result-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            padding: 10px;
-            background-color: #f8f9fa;
-            border-radius: 4px;
+        .table {
+            margin-bottom: 5px;
+            font-size: 13px;
         }
-        .result-title {
-            font-size: 18px;
-            font-weight: bold;
-            color: #333;
+        .table th, .table td {
+            padding: 4px 8px;
+        }
+        .pagination-container {
+            margin-top: 8px;
+        }
+        .pagination {
             margin: 0;
+            padding: 0;
         }
-        .toggle-icon {
-            font-size: 20px;
-            color: #666;
+        .page-link {
+            padding: 4px 8px;
+            font-size: 13px;
+            color: #4CAF50;
+            background-color: white;
+            border: 1px solid #dee2e6;
         }
-        .result-content {
-            white-space: pre-wrap;
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-radius: 4px;
-            font-family: monospace;
-            margin-top: 10px;
-            display: none;
+        .page-link:hover {
+            color: #45a049;
+            background-color: #e9ecef;
+            border-color: #dee2e6;
         }
-        .result-content.show {
-            display: block;
+        .page-item.active .page-link {
+            background-color: #4CAF50;
+            border-color: #4CAF50;
+            color: white;
+        }
+        .page-item.disabled .page-link {
+            color: #6c757d;
+            pointer-events: none;
+            background-color: #fff;
+            border-color: #dee2e6;
         }
         .loading {
             color: #666;
             font-style: italic;
+            font-size: 13px;
         }
         .error {
             color: #dc3545;
             background-color: #f8d7da;
-            padding: 10px;
+            padding: 5px;
             border-radius: 4px;
-            margin-top: 10px;
+            margin-top: 5px;
+            font-size: 13px;
+        }
+        .product-list-section {
+            grid-column: 1 / -1;
+        }
+        .alert {
+            padding: 8px;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+        .form-select {
+            font-size: 13px;
+            padding: 4px 8px;
+        }
+        .input-group {
+            margin-bottom: 8px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Shopping API Demo</h1>
-        <div id="serverStatus">Checking server status...</div>
-        
-        <div class="button-group">
-            <button onclick="checkHealth()">Check Health</button>
-            <button onclick="getCategoryMinPrices()">Get Category Min Prices</button>
-            <button onclick="getBrandLowestPrice()">Get Brand Lowest Price</button>
-        </div>
-
-        <div class="result-container">
-            <div class="result-header" onclick="toggleContent('categoryPriceRange')">
-                <h3 class="result-title">Category Price Range</h3>
-                <span class="toggle-icon">▼</span>
-            </div>
-            <div class="input-group mb-3">
-                <select id="categorySelect" class="form-select" onchange="getCategoryPriceRange()">
-                    <option value="">카테고리를 선택하세요</option>
-                </select>
-            </div>
-            <div id="categoryPriceRange" class="result-content">
-                <div class="alert alert-info">
-                    카테고리를 선택하면 가격 범위 정보를 확인할 수 있습니다.
-                </div>
-            </div>
-        </div>
-
-        <div class="result-container">
-            <div class="result-header" onclick="toggleContent('categoryMinPrices')">
-                <h3 class="result-title">Category Minimum Prices</h3>
-                <span class="toggle-icon">▼</span>
-            </div>
+        <div class="header">
+            <h1>Shopping API Demo</h1>
+            <div id="serverStatus">Checking server status...</div>
             <div class="button-group">
+                <button onclick="checkHealth()">Check Health</button>
                 <button onclick="getCategoryMinPrices()">Get Category Min Prices</button>
-            </div>
-            <div id="categoryMinPrices" class="result-content">Click button to fetch data</div>
-        </div>
-
-        <div class="result-container">
-            <div class="result-header" onclick="toggleContent('brandLowestPrice')">
-                <h3 class="result-title">Brand with Lowest Total Price</h3>
-                <span class="toggle-icon">▼</span>
-            </div>
-            <div class="button-group">
                 <button onclick="getBrandLowestPrice()">Get Brand Lowest Price</button>
             </div>
-            <div id="brandLowestPrice" class="result-content">Click button to fetch data</div>
+        </div>
+
+        <div class="grid-container">
+            <div class="result-container product-list-section">
+                <div class="result-header" onclick="toggleContent('productList')">
+                    <h3 class="result-title">Product List</h3>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="result-content" id="productList">
+                    <div class="button-group">
+                        <button onclick="loadProducts()">Load Products</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Price</th>
+                                    <th>Brand ID</th>
+                                    <th>Category ID</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="productTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination-container">
+                        <nav aria-label="Product pagination">
+                            <ul class="pagination justify-content-center" id="productPagination">
+                            </ul>
+                        </nav>
+                    </div>
+                    <!-- Update Product Modal -->
+                    <div class="modal fade" id="updateProductModal" tabindex="-1" aria-labelledby="updateProductModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="updateProductModalLabel">Update Product</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form id="updateProductForm">
+                                        <input type="hidden" id="updateProductId">
+                                        <div class="mb-3">
+                                            <label for="updateProductName" class="form-label">Name</label>
+                                            <input type="text" class="form-control" id="updateProductName" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="updateProductPrice" class="form-label">Price</label>
+                                            <input type="number" class="form-control" id="updateProductPrice" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Brand ID</label>
+                                            <input type="number" class="form-control" id="updateProductBrandId" readonly>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Category ID</label>
+                                            <input type="number" class="form-control" id="updateProductCategoryId" readonly>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-primary" onclick="updateProduct()">Update</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="result-container">
+                <div class="result-header" onclick="toggleContent('categoryPriceRange')">
+                    <h3 class="result-title">Category Price Range</h3>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="result-content" id="categoryPriceRange">
+                    <div class="category-selection mb-3">
+                        <div class="input-group">
+                            <select id="categorySelect" class="form-select">
+                                <option value="">카테고리를 선택하세요</option>
+                            </select>
+                            <button class="btn btn-primary" onclick="getCategoryPriceRange()">조회</button>
+                        </div>
+                    </div>
+                    <div id="categoryPriceRangeResult">
+                        <div class="alert alert-info">
+                            카테고리를 선택하고 조회 버튼을 클릭하면 가격 범위 정보를 확인할 수 있습니다.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="result-container">
+                <div class="result-header" onclick="toggleContent('categoryMinPrices')">
+                    <h3 class="result-title">Category Minimum Prices</h3>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="result-content" id="categoryMinPrices">
+                    <div class="button-group">
+                        <button onclick="getCategoryMinPrices()">Get Category Min Prices</button>
+                    </div>
+                    <div id="categoryMinPricesResult">
+                        <div class="alert alert-info">
+                            버튼을 클릭하면 각 카테고리별 최저 가격 정보를 확인할 수 있습니다.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="result-container">
+                <div class="result-header" onclick="toggleContent('brandLowestPrice')">
+                    <h3 class="result-title">Brand with Lowest Total Price</h3>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="result-content" id="brandLowestPrice">
+                    <div class="button-group">
+                        <button onclick="getBrandLowestPrice()">Get Brand Lowest Price</button>
+                    </div>
+                    <div id="brandLowestPriceResult">
+                        <div class="alert alert-info">
+                            버튼을 클릭하면 전체 카테고리 중 가장 저렴한 브랜드의 가격 정보를 확인할 수 있습니다.
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -169,12 +330,37 @@
         }
 
         function toggleContent(contentId) {
-            const content = document.getElementById(contentId);
-            const header = content.previousElementSibling;
-            const icon = header.querySelector('.toggle-icon');
+            // 동기화 그룹 정의
+            const syncGroups = {
+                'categoryPriceRange': ['categoryPriceRange', 'categoryMinPrices'],
+                'categoryMinPrices': ['categoryPriceRange', 'categoryMinPrices']
+            };
             
-            content.classList.toggle('show');
-            icon.textContent = content.classList.contains('show') ? '▼' : '▶';
+            let group = syncGroups[contentId];
+            if (group) {
+                // 그룹 내 모든 섹션의 상태를 동기화
+                const anyOpen = group.some(id => document.getElementById(id).classList.contains('show'));
+                group.forEach(id => {
+                    const content = document.getElementById(id);
+                    const header = content.previousElementSibling;
+                    const icon = header.querySelector('.toggle-icon');
+                    if (anyOpen) {
+                        content.classList.remove('show');
+                        icon.textContent = '▶';
+                    } else {
+                        content.classList.add('show');
+                        icon.textContent = '▼';
+                    }
+                });
+            } else {
+                // 기존 단일 토글 동작
+                const content = document.getElementById(contentId);
+                const header = content.previousElementSibling;
+                const icon = header.querySelector('.toggle-icon');
+                content.classList.toggle('show');
+                icon.textContent = content.classList.contains('show') ? '▼' : '▶';
+            }
+            return false;
         }
 
         async function loadCategories() {
@@ -184,7 +370,6 @@
                 const response = await fetch('/api/v1/categories');
                 const categories = await response.json();
                 
-                // 카테고리 선택 드롭다운 채우기
                 categorySelect.innerHTML = `
                     <option value="">카테고리를 선택하세요</option>
                     ${categories.map(category => `
@@ -197,21 +382,19 @@
         }
 
         async function getCategoryPriceRange() {
-            const resultDiv = document.getElementById('categoryPriceRange');
+            const resultDiv = document.getElementById('categoryPriceRangeResult');
             const categoryId = document.getElementById('categorySelect').value;
             
             if (!categoryId) {
                 resultDiv.innerHTML = `
                     <div class="alert alert-info">
-                        카테고리를 선택하면 가격 범위 정보를 확인할 수 있습니다.
+                        카테고리를 선택하고 조회 버튼을 클릭하면 가격 범위 정보를 확인할 수 있습니다.
                     </div>
                 `;
-                resultDiv.classList.add('show');
                 return;
             }
             
             resultDiv.innerHTML = '<span class="loading">Loading...</span>';
-            resultDiv.classList.add('show');
             
             try {
                 const response = await fetch(`/api/v1/products/categories/${categoryId}/price-range`, {
@@ -225,7 +408,6 @@
                 }
                 const data = await response.json();
                 
-                // 데이터 유효성 검사
                 if (!data || !data.category || !data.lowestPrice || !data.highestPrice) {
                     throw new Error('가격 정보가 올바르지 않습니다.');
                 }
@@ -240,7 +422,7 @@
                                         <th>최저가 브랜드</th>
                                         <td>
                                             ${data.lowestPrice.map(item => 
-                                                `${item.brand} (${item.price}원)`
+                                                `${item.brand} (${item.price.toLocaleString()}원)`
                                             ).join('<br>')}
                                         </td>
                                     </tr>
@@ -248,7 +430,7 @@
                                         <th>최고가 브랜드</th>
                                         <td>
                                             ${data.highestPrice.map(item => 
-                                                `${item.brand} (${item.price}원)`
+                                                `${item.brand} (${item.price.toLocaleString()}원)`
                                             ).join('<br>')}
                                         </td>
                                     </tr>
@@ -268,9 +450,8 @@
         }
 
         async function getCategoryMinPrices() {
-            const resultDiv = document.getElementById('categoryMinPrices');
+            const resultDiv = document.getElementById('categoryMinPricesResult');
             resultDiv.innerHTML = '<span class="loading">Loading...</span>';
-            resultDiv.classList.add('show');
             
             try {
                 const response = await fetch('/api/v1/products/categories/minimum-prices', {
@@ -283,16 +464,59 @@
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const data = await response.json();
-                resultDiv.textContent = JSON.stringify(data, null, 2);
+                
+                if (!data || !data.categories) {
+                    throw new Error('가격 정보가 올바르지 않습니다.');
+                }
+
+                // 총 금액 계산
+                const totalAmount = data.categories.reduce((sum, category) => {
+                    const price = parseInt(category.lowestProduct.price.replace(/,/g, ''));
+                    return sum + (isNaN(price) ? 0 : price);
+                }, 0);
+
+                resultDiv.innerHTML = `
+                    <div class="category-min-prices-info">
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>카테고리</th>
+                                        <th>브랜드</th>
+                                        <th>최저 가격</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${data.categories.map(category => `
+                                        <tr>
+                                            <td>${category.category}</td>
+                                            <td>${category.lowestProduct.brand.name}</td>
+                                            <td>${category.lowestProduct.price}원</td>
+                                        </tr>
+                                    `).join('')}
+                                    <tr class="table-primary">
+                                        <th colspan="2">총 금액</th>
+                                        <th>${totalAmount.toLocaleString()}원</th>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
             } catch (error) {
-                resultDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+                console.error('Error:', error);
+                resultDiv.innerHTML = `
+                    <div class="alert alert-danger">
+                        <h5>오류가 발생했습니다</h5>
+                        <p>${error.message}</p>
+                    </div>
+                `;
             }
         }
 
         async function getBrandLowestPrice() {
-            const resultDiv = document.getElementById('brandLowestPrice');
+            const resultDiv = document.getElementById('brandLowestPriceResult');
             resultDiv.innerHTML = '<span class="loading">Loading...</span>';
-            resultDiv.classList.add('show');
             
             try {
                 const response = await fetch('/api/v1/products/brands/lowest-total-price', {
@@ -305,17 +529,215 @@
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const data = await response.json();
-                resultDiv.textContent = JSON.stringify(data, null, 2);
+                
+                if (!data || !data.lowestPriceInfo) {
+                    throw new Error('가격 정보가 올바르지 않습니다.');
+                }
+
+                const { brand, categories, totalPrice } = data.lowestPriceInfo;
+
+                resultDiv.innerHTML = `
+                    <div class="brand-price-info">
+                        <h4>${brand} 브랜드 가격 정보</h4>
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>카테고리</th>
+                                        <th>가격</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${categories.map(category => `
+                                        <tr>
+                                            <td>${category.category}</td>
+                                            <td>${category.price.toLocaleString()}원</td>
+                                        </tr>
+                                    `).join('')}
+                                    <tr class="table-primary">
+                                        <th>총 가격</th>
+                                        <th>${totalPrice.toLocaleString()}원</th>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
             } catch (error) {
-                resultDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+                resultDiv.innerHTML = `
+                    <div class="alert alert-danger">
+                        <h5>오류가 발생했습니다</h5>
+                        <p>${error.message}</p>
+                    </div>
+                `;
             }
         }
 
-        // 페이지 로드 시 자동으로 health 체크와 카테고리 목록 로드
-        window.onload = () => {
-            checkHealth();
+        // Product listing and pagination
+        async function loadProducts(page = 0) {
+            const resultDiv = document.getElementById('productList');
+            const tableBody = document.getElementById('productTableBody');
+            const pagination = document.getElementById('productPagination');
+            
+            resultDiv.classList.add('show');
+            tableBody.innerHTML = '<tr><td colspan="6" class="text-center">Loading...</td></tr>';
+            
+            try {
+                const response = await fetch('/api/v1/products');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const responseData = await response.json();
+                const allProducts = responseData.data;
+                const pageSize = 5;
+                const totalCount = allProducts.length;
+                const totalPages = Math.ceil(totalCount / pageSize);
+                const startIndex = page * pageSize;
+                const endIndex = Math.min(startIndex + pageSize, totalCount);
+                const products = allProducts.slice(startIndex, endIndex);
+                
+                // Update table
+                tableBody.innerHTML = products.map(product => `
+                    <tr>
+                        <td>${product.id}</td>
+                        <td>${product.name}</td>
+                        <td>${product.price.toLocaleString()}원</td>
+                        <td>${product.brandId}</td>
+                        <td>${product.categoryId}</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary me-1" onclick="openUpdateModal(${product.id}, '${product.name}', ${product.price}, ${product.brandId}, ${product.categoryId})">Update</button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteProduct(${product.id})">Delete</button>
+                        </td>
+                    </tr>
+                `).join('');
+                
+                // Update pagination
+                let paginationHtml = '';
+                
+                // Previous button
+                paginationHtml += `
+                    <li class="page-item ${page === 0 ? 'disabled' : ''}">
+                        <button class="page-link" onclick="loadProducts(${page - 1})" ${page === 0 ? 'disabled' : ''}>Previous</button>
+                    </li>
+                `;
+                
+                // Page numbers
+                for (let i = 0; i < totalPages; i++) {
+                    paginationHtml += `
+                        <li class="page-item ${i === page ? 'active' : ''}">
+                            <button class="page-link" onclick="loadProducts(${i})">${i + 1}</button>
+                        </li>
+                    `;
+                }
+                
+                // Next button
+                paginationHtml += `
+                    <li class="page-item ${page === totalPages - 1 ? 'disabled' : ''}">
+                        <button class="page-link" onclick="loadProducts(${page + 1})" ${page === totalPages - 1 ? 'disabled' : ''}>Next</button>
+                    </li>
+                `;
+                
+                pagination.innerHTML = paginationHtml;
+                
+            } catch (error) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center text-danger">
+                            Error loading products: ${error.message}
+                        </td>
+                    </tr>
+                `;
+                pagination.innerHTML = '';
+            }
+            
+            return false;
+        }
+
+        function openUpdateModal(id, name, price, brandId, categoryId) {
+            document.getElementById('updateProductId').value = id;
+            document.getElementById('updateProductName').value = name;
+            document.getElementById('updateProductPrice').value = price;
+            document.getElementById('updateProductBrandId').value = brandId;
+            document.getElementById('updateProductCategoryId').value = categoryId;
+            
+            const modalElement = document.getElementById('updateProductModal');
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+        }
+
+        async function updateProduct() {
+            const id = document.getElementById('updateProductId').value;
+            const name = document.getElementById('updateProductName').value;
+            const price = document.getElementById('updateProductPrice').value;
+            const brandId = document.getElementById('updateProductBrandId').value;
+            const categoryId = document.getElementById('updateProductCategoryId').value;
+
+            try {
+                const response = await fetch(`/api/v1/products/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name,
+                        price: parseInt(price),
+                        brandId: parseInt(brandId),
+                        categoryId: parseInt(categoryId)
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                // Close modal
+                const modalElement = document.getElementById('updateProductModal');
+                const modal = bootstrap.Modal.getInstance(modalElement);
+                modal.hide();
+
+                // Reload products
+                loadProducts();
+
+            } catch (error) {
+                alert(`Error updating product: ${error.message}`);
+            }
+        }
+
+        async function deleteProduct(id) {
+            if (!confirm('Are you sure you want to delete this product?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/v1/products/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                // Reload products
+                loadProducts();
+
+            } catch (error) {
+                alert(`Error deleting product: ${error.message}`);
+            }
+        }
+
+        // Prevent default behavior for all links and buttons
+        document.addEventListener('click', function(e) {
+            if (e.target.tagName === 'A' || e.target.tagName === 'BUTTON') {
+                e.preventDefault();
+            }
+        });
+
+        // Load categories when page loads
+        document.addEventListener('DOMContentLoaded', function() {
             loadCategories();
-        };
+            checkHealth();
+        });
     </script>
 </body>
 </html> 

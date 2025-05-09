@@ -35,6 +35,12 @@ interface ProductRepository {
     fun findById(id: Long): Mono<Product>
     
     /**
+     * Finds all products.
+     * @return A Flux emitting all products, excluding soft-deleted ones
+     */
+    fun findAll(): Flux<Product>
+    
+    /**
      * Finds the cheapest product by category ID.
      * @param categoryId The ID of the category to find the cheapest product for
      * @return A Mono emitting the cheapest product, or empty if not found
