@@ -10,6 +10,7 @@ object CategoryMapper {
         return CategoryResponseDto(
             id = id,
             name = category.name,
+            localizedName = category.name.getLocalizedName("ko"),
             createdAt = category.createdAt,
             updatedAt = category.updatedAt
         )

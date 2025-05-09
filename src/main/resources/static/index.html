@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shopping API Demo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -104,7 +105,23 @@
             <button onclick="checkHealth()">Check Health</button>
             <button onclick="getCategoryMinPrices()">Get Category Min Prices</button>
             <button onclick="getBrandLowestPrice()">Get Brand Lowest Price</button>
-            <button onclick="getCategoryPriceRange()">Get Category Price Range</button>
+        </div>
+
+        <div class="result-container">
+            <div class="result-header" onclick="toggleContent('categoryPriceRange')">
+                <h3 class="result-title">Category Price Range</h3>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="input-group mb-3">
+                <select id="categorySelect" class="form-select" onchange="getCategoryPriceRange()">
+                    <option value="">카테고리를 선택하세요</option>
+                </select>
+            </div>
+            <div id="categoryPriceRange" class="result-content">
+                <div class="alert alert-info">
+                    카테고리를 선택하면 가격 범위 정보를 확인할 수 있습니다.
+                </div>
+            </div>
         </div>
 
         <div class="result-container">
@@ -127,18 +144,6 @@
                 <button onclick="getBrandLowestPrice()">Get Brand Lowest Price</button>
             </div>
             <div id="brandLowestPrice" class="result-content">Click button to fetch data</div>
-        </div>
-
-        <div class="result-container">
-            <div class="result-header" onclick="toggleContent('categoryPriceRange')">
-                <h3 class="result-title">Category Price Range</h3>
-                <span class="toggle-icon">▼</span>
-            </div>
-            <div class="input-group">
-                <input type="number" id="categoryId" placeholder="Enter Category ID">
-                <button onclick="getCategoryPriceRange()">Get Price Range</button>
-            </div>
-            <div id="categoryPriceRange" class="result-content">Enter category ID and click button to fetch data</div>
         </div>
     </div>
 
@@ -170,6 +175,96 @@
             
             content.classList.toggle('show');
             icon.textContent = content.classList.contains('show') ? '▼' : '▶';
+        }
+
+        async function loadCategories() {
+            const categorySelect = document.getElementById('categorySelect');
+            
+            try {
+                const response = await fetch('/api/v1/categories');
+                const categories = await response.json();
+                
+                // 카테고리 선택 드롭다운 채우기
+                categorySelect.innerHTML = `
+                    <option value="">카테고리를 선택하세요</option>
+                    ${categories.map(category => `
+                        <option value="${category.id}">${category.localizedName} (${category.name})</option>
+                    `).join('')}
+                `;
+            } catch (error) {
+                categorySelect.innerHTML = '<option value="">카테고리 로딩 실패</option>';
+            }
+        }
+
+        async function getCategoryPriceRange() {
+            const resultDiv = document.getElementById('categoryPriceRange');
+            const categoryId = document.getElementById('categorySelect').value;
+            
+            if (!categoryId) {
+                resultDiv.innerHTML = `
+                    <div class="alert alert-info">
+                        카테고리를 선택하면 가격 범위 정보를 확인할 수 있습니다.
+                    </div>
+                `;
+                resultDiv.classList.add('show');
+                return;
+            }
+            
+            resultDiv.innerHTML = '<span class="loading">Loading...</span>';
+            resultDiv.classList.add('show');
+            
+            try {
+                const response = await fetch(`/api/v1/products/categories/${categoryId}/price-range`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                
+                // 데이터 유효성 검사
+                if (!data || !data.category || !data.lowestPrice || !data.highestPrice) {
+                    throw new Error('가격 정보가 올바르지 않습니다.');
+                }
+
+                resultDiv.innerHTML = `
+                    <div class="price-range-info">
+                        <h4>${data.category} 카테고리 가격 정보</h4>
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <tbody>
+                                    <tr>
+                                        <th>최저가 브랜드</th>
+                                        <td>
+                                            ${data.lowestPrice.map(item => 
+                                                `${item.brand} (${item.price}원)`
+                                            ).join('<br>')}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>최고가 브랜드</th>
+                                        <td>
+                                            ${data.highestPrice.map(item => 
+                                                `${item.brand} (${item.price}원)`
+                                            ).join('<br>')}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="alert alert-danger">
+                        <h5>오류가 발생했습니다</h5>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
         }
 
         async function getCategoryMinPrices() {
@@ -216,38 +311,11 @@
             }
         }
 
-        async function getCategoryPriceRange() {
-            const resultDiv = document.getElementById('categoryPriceRange');
-            const categoryId = document.getElementById('categoryId').value;
-            
-            if (!categoryId) {
-                resultDiv.innerHTML = '<div class="error">Please enter a category ID</div>';
-                resultDiv.classList.add('show');
-                return;
-            }
-            
-            resultDiv.innerHTML = '<span class="loading">Loading...</span>';
-            resultDiv.classList.add('show');
-            
-            try {
-                const response = await fetch(`/api/v1/products/categories/${categoryId}/price-range`, {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                });
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const data = await response.json();
-                resultDiv.textContent = JSON.stringify(data, null, 2);
-            } catch (error) {
-                resultDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
-            }
-        }
-
-        // 페이지 로드 시 자동으로 health 체크
-        window.onload = checkHealth;
+        // 페이지 로드 시 자동으로 health 체크와 카테고리 목록 로드
+        window.onload = () => {
+            checkHealth();
+            loadCategories();
+        };
     </script>
 </body>
 </html> 
