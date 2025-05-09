@@ -9,6 +9,7 @@ data class ProductEvent(
     enum class EventType {
         CREATED,
         UPDATED,
-        DELETED
+        DELETED,
+        DELETED_ALL
     }
 } 

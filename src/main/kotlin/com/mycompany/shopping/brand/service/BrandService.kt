@@ -45,4 +45,10 @@ interface BrandService {
      * @return A Mono emitting the brand response
      */
     fun getBrandById(id: Long): Mono<BrandResponseDto>
+
+    /**
+     * Retrieves all brands.
+     * @return A Flux emitting all brand response DTOs
+     */
+    fun getAllBrands(): Flux<BrandResponseDto>
 } 

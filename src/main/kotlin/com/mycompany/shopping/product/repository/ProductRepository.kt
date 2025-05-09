@@ -55,6 +55,13 @@ interface ProductRepository {
     fun softDelete(id: Long): Mono<Void>
 
     /**
+     * Performs a soft delete of all products associated with a brand.
+     * @param brandId The ID of the brand whose products should be deleted
+     * @return A Mono completing when the deletion is done
+     */
+    fun softDeleteByBrandId(brandId: Long): Flux<Product>
+
+    /**
      * Finds the product with the minimum and maximum price for a given category ID.
      * @param categoryId The ID of the category to find the min/max price product for
      * @return A Mono emitting the product with the min/max price, or empty if not found

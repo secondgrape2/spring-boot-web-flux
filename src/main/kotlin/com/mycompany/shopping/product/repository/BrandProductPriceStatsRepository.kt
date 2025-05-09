@@ -9,4 +9,5 @@ interface BrandProductPriceStatsRepository {
     fun findByBrandId(brandId: Long): Mono<BrandProductPriceStats>
     fun save(brandProductPriceStats: BrandProductPriceStats): Mono<BrandProductPriceStats>
     fun findByTotalMinPriceBrandStats(): Mono<BrandProductPriceStats>
+    fun delete(id: Long): Mono<Void>
 } 

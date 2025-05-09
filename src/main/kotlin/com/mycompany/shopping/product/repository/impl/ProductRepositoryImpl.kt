@@ -26,6 +26,10 @@ interface ProductR2dbcRepository : ReactiveCrudRepository<ProductEntity, Long> {
     @Query("UPDATE products SET deleted_at = :deletedAt, updated_at = :updatedAt WHERE id = :id AND deleted_at IS NULL")
     fun markAsDeleted(id: Long, deletedAt: Instant, updatedAt: Instant): Mono<Integer>
 
+    @Modifying
+    @Query("UPDATE products SET deleted_at = :deletedAt, updated_at = :updatedAt WHERE brand_id = :brandId AND deleted_at IS NULL")
+    fun markAsDeletedByBrandId(brandId: Long, deletedAt: Instant, updatedAt: Instant): Flux<Integer>
+
     @Query("""
         WITH RankedProducts AS (
             SELECT
@@ -194,6 +198,18 @@ class ProductRepositoryR2dbcImpl(
         val now = Instant.now()
         return productR2dbcRepository.markAsDeleted(id, now, now)
             .then()
+    }
+
+    override fun softDeleteByBrandId(brandId: Long): Flux<Product> {
+        val now = Instant.now()
+        return productR2dbcRepository.markAsDeletedByBrandId(brandId, now, now)
+            .thenMany(
+                productR2dbcRepository.findAll()
+                    .filter { it.brandId == brandId && it.deletedAt == now }
+            )
+            .map { 
+                it.toDomain() 
+            }
     }
 
     override fun findCheapestProductsByCategory(): Flux<ProductWithBrand> {
