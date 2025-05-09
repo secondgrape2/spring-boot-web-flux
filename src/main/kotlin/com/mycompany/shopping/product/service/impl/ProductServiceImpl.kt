@@ -115,6 +115,13 @@ class ProductServiceImpl(
             .then()
     }
 
+    override fun softDeleteByBrandId(brandId: Long): Flux<Void> {
+        return productRepository.softDeleteByBrandId(brandId)
+            .flatMap { product ->
+                eventPublisher.publish(ProductEvent(product = product, eventType = ProductEvent.EventType.DELETED_ALL))
+            }
+    }
+
     override fun findMinMaxPriceProductsWithBrandByCategoryId(categoryId: Long): Mono<MinMaxPriceProductWithBrandDomain> {
         return productRepository.findMinMaxPriceProductsWithBrandByCategoryId(categoryId)
     }

@@ -67,4 +67,10 @@ class BrandRepositoryR2dbcImpl(
         return brandR2dbcRepository.markAsDeleted(id, now, now)
                 .then()
     }
+
+    override fun findAll(): Flux<Brand> {
+        return brandR2dbcRepository.findAll()
+            .filter { it.deletedAt == null }
+            .map { it.toDomain() }
+    }
 }

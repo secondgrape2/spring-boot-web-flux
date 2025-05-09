@@ -23,13 +23,42 @@ class BrandStatsServiceImpl(
     init {
         eventSubscriber.subscribe(ProductEvent::class.java)
             .subscribe { event ->
-                updateBrandStats(event.product.brandId)
-                .subscribe()
+                when (event.eventType) {
+                    ProductEvent.EventType.CREATED -> {
+                        updateBrandStats(event.product.brandId)
+                            .subscribe()
+                    }
+                    ProductEvent.EventType.UPDATED -> {
+                        updateBrandStats(event.product.brandId)
+                            .subscribe()
+                    }
+                    ProductEvent.EventType.DELETED -> {
+                        updateBrandStats(event.product.brandId)
+                            .subscribe()
+                    }
+                    ProductEvent.EventType.DELETED_ALL -> {
+                        deleteBrandStats(event.product.brandId)
+                            .subscribe()
+                    }
+                }
             }
     }
 
     override fun getMinTotalPriceBrandStats(): Mono<BrandProductPriceStats> {
         return statsRepository.findByTotalMinPriceBrandStats()
+    }
+
+    fun deleteBrandStats(brandId: Long): Mono<Void> {
+        return statsRepository.findByBrandId(brandId)
+            .flatMap { existingStats ->
+                val id = existingStats.id
+                if (id != null) {
+                    statsRepository.delete(id)
+                } else {
+                    Mono.empty<Void>()
+                }
+            }
+            .then()
     }
 
     override fun updateBrandStats(brandId: Long): Mono<Void> {

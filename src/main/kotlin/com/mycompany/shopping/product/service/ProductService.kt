@@ -38,6 +38,13 @@ interface ProductService {
     fun deleteProduct(id: Long): Mono<Void>
 
     /**
+     * Performs a soft delete of all products associated with a brand.
+     * @param brandId The ID of the brand whose products should be deleted
+     * @return A Mono completing when the deletion is done
+     */
+    fun softDeleteByBrandId(brandId: Long): Flux<Void>
+
+    /**
      * Retrieves the cheapest products by category.
      *
      * @return A Flux emitting [ProductWithBrand] objects, each representing the cheapest product in a category.

@@ -44,4 +44,10 @@ interface BrandRepository {
      * @return A Mono completing when the deletion is done
      */
     fun softDelete(id: Long): Mono<Void>
+
+    /**
+     * Retrieves all brands.
+     * @return A Flux emitting all brands
+     */
+    fun findAll(): Flux<Brand>
 } 

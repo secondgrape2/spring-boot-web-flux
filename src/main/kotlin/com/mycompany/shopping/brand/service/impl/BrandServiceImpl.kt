@@ -15,6 +15,7 @@ import org.springframework.transaction.reactive.TransactionalOperator
 import reactor.core.publisher.Mono
 import java.time.Instant
 import com.mycompany.shopping.common.exception.InvalidFieldException
+import reactor.core.publisher.Flux
 
 @Service
 class BrandServiceImpl(
@@ -48,6 +49,11 @@ class BrandServiceImpl(
     
     override fun getBrandById(id: Long): Mono<BrandResponseDto> {
         return brandRepository.findById(id)
+            .map { mapToBrandResponse(it) }
+    }
+
+    override fun getAllBrands(): Flux<BrandResponseDto> {
+        return brandRepository.findAll()
             .map { mapToBrandResponse(it) }
     }
 

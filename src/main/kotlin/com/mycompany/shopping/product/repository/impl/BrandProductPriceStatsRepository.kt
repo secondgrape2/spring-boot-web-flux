@@ -52,4 +52,9 @@ class BrandProductPriceStatsRepositoryR2dbcImpl(
         return repository.findByTotalMinPriceStats()
             .map { it.toDomain() }
     }
+
+    override fun delete(id: Long): Mono<Void> {
+        return repository.deleteById(id)
+            .then()
+    }
 }
