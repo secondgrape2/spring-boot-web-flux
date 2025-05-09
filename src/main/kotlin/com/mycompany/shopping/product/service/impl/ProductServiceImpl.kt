@@ -40,6 +40,11 @@ class ProductServiceImpl(
         return productRepository.findCheapestProductsByCategory()
     }
 
+    override fun getAllProducts(): Flux<ProductResponseDto> {
+        return productRepository.findAll()
+            .map { product -> productMapper.toResponseDto(product) }
+    }
+
     override fun createProduct(request: CreateProductRequestDto): Mono<ProductResponseDto> {
         return Mono.zip(
             brandService.getBrandById(request.brandId),

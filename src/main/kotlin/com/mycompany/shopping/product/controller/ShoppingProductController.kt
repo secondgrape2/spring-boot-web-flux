@@ -20,6 +20,7 @@ import io.swagger.v3.oas.annotations.Parameter
 import com.mycompany.shopping.product.exceptions.InvalidCategoryException
 import com.mycompany.shopping.product.dto.*
 import com.mycompany.shopping.product.service.ShoppingProductService
+import reactor.core.publisher.Flux
 
 @RestController
 @RequestMapping("/api/v1/products")
@@ -135,6 +136,47 @@ class ShoppingProductController(
     ): Mono<CategoryPriceRangeResponseDto> {
 
         return shoppingProductService.getCategoryPriceRange(categoryId)
+    }
+
+    @Operation(
+        summary = "Get all products",
+        description = "Returns a list of all products with pagination metadata"
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Successfully retrieved all products",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ProductListData::class)
+                )]
+            ),
+            ApiResponse(
+                responseCode = "500",
+                description = "Internal Server Error",
+                content = [Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ErrorResponse::class)
+                )]
+            )
+        ]
+    )
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    fun getAllProducts(): Mono<ProductListData> {
+        // TODO: Add pagination implementation
+        return productService.getAllProducts()
+            .collectList()
+            .map { products ->
+                ProductListData(
+                    data = products,
+                    totalCount = products.size.toLong(),
+                    totalPages = 1,
+                    currentPage = 0,
+                    pageSize = products.size
+                )
+            }
     }
 
     @Operation(

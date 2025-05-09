@@ -184,6 +184,12 @@ class ProductRepositoryR2dbcImpl(
             .map { it.toDomain() }
     }
 
+    override fun findAll(): Flux<Product> {
+        return productR2dbcRepository.findAll()
+            .filter { it.deletedAt == null }
+            .map { it.toDomain() }
+    }
+
     override fun softDelete(id: Long): Mono<Void> {
         val now = Instant.now()
         return productR2dbcRepository.markAsDeleted(id, now, now)

@@ -45,6 +45,13 @@ interface ProductService {
     fun findCheapestProductsByCategory(): Flux<ProductWithBrand>
 
     /**
+     * Retrieves all products.
+     *
+     * @return A Flux emitting [ProductResponseDto] objects, each representing a product.
+     */
+    fun getAllProducts(): Flux<ProductResponseDto>
+
+    /**
      * Retrieves the minimum and maximum price products with brand by category ID.
      *
      * @param categoryId The ID of the category to search for
