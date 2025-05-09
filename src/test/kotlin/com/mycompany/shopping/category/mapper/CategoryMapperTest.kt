@@ -27,6 +27,7 @@ class CategoryMapperTest {
         val expected = CategoryResponseDto(
             id = 1L,
             name = ProductCategory.TOP,
+            localizedName = ProductCategory.TOP.getLocalizedName("ko"),
             createdAt = now,
             updatedAt = now
         )
@@ -52,6 +53,7 @@ class CategoryMapperTest {
         val expected = CategoryResponseDto(
             id = 1L,
             name = ProductCategory.TOP,
+            localizedName = ProductCategory.TOP.getLocalizedName("ko"),
             createdAt = createdAt,
             updatedAt = updatedAt
         )
@@ -76,6 +78,7 @@ class CategoryMapperTest {
         val expected = CategoryResponseDto(
             id = 1L,
             name = ProductCategory.TOP,
+            localizedName = ProductCategory.TOP.getLocalizedName("ko"),
             createdAt = now,
             updatedAt = now
         )
