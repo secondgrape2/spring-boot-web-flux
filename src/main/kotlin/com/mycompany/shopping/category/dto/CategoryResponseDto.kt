@@ -14,6 +14,9 @@ data class CategoryResponseDto(
     @NotBlank(message = "Category name is required")
     val name: ProductCategory,
 
+    @Schema(description = "Localized category name")
+    val localizedName: String,
+
     @Schema(description = "Created at")
     val createdAt: Instant,
     
