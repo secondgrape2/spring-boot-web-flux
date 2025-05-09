@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping API Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            text-align: center;
+        }
+        .button-group {
+            margin: 20px 0;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #serverStatus {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .status-up {
+            background-color: #dff0d8;
+            color: #3c763d;
+        }
+        .status-down {
+            background-color: #f2dede;
+            color: #a94442;
+        }
+        .result-container {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            text-align: left;
+        }
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        .result-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin: 0;
+        }
+        .toggle-icon {
+            font-size: 20px;
+            color: #666;
+        }
+        .result-content {
+            white-space: pre-wrap;
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            margin-top: 10px;
+            display: none;
+        }
+        .result-content.show {
+            display: block;
+        }
+        .loading {
+            color: #666;
+            font-style: italic;
+        }
+        .error {
+            color: #dc3545;
+            background-color: #f8d7da;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Shopping API Demo</h1>
+        <div id="serverStatus">Checking server status...</div>
+        
+        <div class="button-group">
+            <button onclick="checkHealth()">Check Health</button>
+            <button onclick="getCategoryMinPrices()">Get Category Min Prices</button>
+            <button onclick="getBrandLowestPrice()">Get Brand Lowest Price</button>
+            <button onclick="getCategoryPriceRange()">Get Category Price Range</button>
+        </div>
+
+        <div class="result-container">
+            <div class="result-header" onclick="toggleContent('categoryMinPrices')">
+                <h3 class="result-title">Category Minimum Prices</h3>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="button-group">
+                <button onclick="getCategoryMinPrices()">Get Category Min Prices</button>
+            </div>
+            <div id="categoryMinPrices" class="result-content">Click button to fetch data</div>
+        </div>
+
+        <div class="result-container">
+            <div class="result-header" onclick="toggleContent('brandLowestPrice')">
+                <h3 class="result-title">Brand with Lowest Total Price</h3>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="button-group">
+                <button onclick="getBrandLowestPrice()">Get Brand Lowest Price</button>
+            </div>
+            <div id="brandLowestPrice" class="result-content">Click button to fetch data</div>
+        </div>
+
+        <div class="result-container">
+            <div class="result-header" onclick="toggleContent('categoryPriceRange')">
+                <h3 class="result-title">Category Price Range</h3>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="input-group">
+                <input type="number" id="categoryId" placeholder="Enter Category ID">
+                <button onclick="getCategoryPriceRange()">Get Price Range</button>
+            </div>
+            <div id="categoryPriceRange" class="result-content">Enter category ID and click button to fetch data</div>
+        </div>
+    </div>
+
+    <script>
+        async function checkHealth() {
+            try {
+                const response = await fetch('/actuator/health');
+                const data = await response.json();
+                const statusDiv = document.getElementById('serverStatus');
+                
+                if (data.status === 'UP') {
+                    statusDiv.textContent = 'Server is running!';
+                    statusDiv.className = 'status-up';
+                } else {
+                    statusDiv.textContent = 'Server is not running properly';
+                    statusDiv.className = 'status-down';
+                }
+            } catch (error) {
+                const statusDiv = document.getElementById('serverStatus');
+                statusDiv.textContent = 'Server is not running';
+                statusDiv.className = 'status-down';
+            }
+        }
+
+        function toggleContent(contentId) {
+            const content = document.getElementById(contentId);
+            const header = content.previousElementSibling;
+            const icon = header.querySelector('.toggle-icon');
+            
+            content.classList.toggle('show');
+            icon.textContent = content.classList.contains('show') ? '▼' : '▶';
+        }
+
+        async function getCategoryMinPrices() {
+            const resultDiv = document.getElementById('categoryMinPrices');
+            resultDiv.innerHTML = '<span class="loading">Loading...</span>';
+            resultDiv.classList.add('show');
+            
+            try {
+                const response = await fetch('/api/v1/products/categories/minimum-prices', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                resultDiv.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+            }
+        }
+
+        async function getBrandLowestPrice() {
+            const resultDiv = document.getElementById('brandLowestPrice');
+            resultDiv.innerHTML = '<span class="loading">Loading...</span>';
+            resultDiv.classList.add('show');
+            
+            try {
+                const response = await fetch('/api/v1/products/brands/lowest-total-price', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                resultDiv.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+            }
+        }
+
+        async function getCategoryPriceRange() {
+            const resultDiv = document.getElementById('categoryPriceRange');
+            const categoryId = document.getElementById('categoryId').value;
+            
+            if (!categoryId) {
+                resultDiv.innerHTML = '<div class="error">Please enter a category ID</div>';
+                resultDiv.classList.add('show');
+                return;
+            }
+            
+            resultDiv.innerHTML = '<span class="loading">Loading...</span>';
+            resultDiv.classList.add('show');
+            
+            try {
+                const response = await fetch(`/api/v1/products/categories/${categoryId}/price-range`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                resultDiv.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+            }
+        }
+
+        // 페이지 로드 시 자동으로 health 체크
+        window.onload = checkHealth;
+    </script>
+</body>
+</html> 
