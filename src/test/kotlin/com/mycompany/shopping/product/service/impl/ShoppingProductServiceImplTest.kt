@@ -8,6 +8,10 @@ import com.mycompany.shopping.product.repository.ProductRepository
 import com.mycompany.shopping.brand.service.BrandService
 import com.mycompany.shopping.category.service.CategoryService
 import com.mycompany.shopping.product.mapper.ProductMapper
+import com.mycompany.shopping.product.service.ShoppingProductService
+import com.mycompany.shopping.product.service.ProductService
+import com.mycompany.shopping.product.service.BrandStatsService
+import com.mycompany.shopping.product.infrastructures.ProductEventPublisher
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
@@ -22,7 +26,7 @@ import com.mycompany.shopping.product.domain.ProductWithBrandDomain
 
 
 @ExtendWith(MockitoExtension::class)
-class ProductServiceImplTest {
+class ShoppingProductServiceImplTest {
 
     @Mock
     private lateinit var productRepository: ProductRepository
@@ -36,8 +40,19 @@ class ProductServiceImplTest {
     @Mock
     private lateinit var productMapper: ProductMapper
 
+    @Mock
+    private lateinit var eventPublisher: ProductEventPublisher
+
+    @Mock
+    private lateinit var brandStatsService: BrandStatsService
+
+    @Mock
+    private lateinit var productService: ProductService
+
     @InjectMocks
-    private lateinit var productService: ProductServiceImpl
+    private lateinit var shoppingProductServiceImpl: ShoppingProductServiceImpl
+
+    
     @Test
     fun `mapToCategoryLowestPriceInfo should correctly map ProductWithBrand to CategoryLowestPriceInfoDto`() {
         // given
@@ -55,7 +70,7 @@ class ProductServiceImplTest {
         )
 
         // when
-        val result = productService.mapToCategoryLowestPriceInfo(product)
+        val result = shoppingProductServiceImpl.mapToCategoryLowestPriceInfo(product)
 
         // then
         assert(result.category == ProductCategory.TOP.getLocalizedName("ko"))
@@ -84,7 +99,7 @@ class ProductServiceImplTest {
         )
 
         // when
-        val result = productService.calculateTotalLowestPrice(categoryLowestPriceInfo)
+        val result = shoppingProductServiceImpl.calculateTotalLowestPrice(categoryLowestPriceInfo)
 
         // then
         assert(result == "30,000")
@@ -120,11 +135,11 @@ class ProductServiceImplTest {
             categoryName = ProductCategory.BOTTOM
         )
 
-        `when`(productRepository.findCheapestProductsByCategory())
+        `when`(productService.findCheapestProductsByCategory())
             .thenReturn(Flux.just(product1, product2))
 
         // when
-        val result = productService.getCategoryMinPricesWithTotalAmount()
+        val result = shoppingProductServiceImpl.getCategoryMinPricesWithTotalAmount()
 
         // then
         StepVerifier.create(result)

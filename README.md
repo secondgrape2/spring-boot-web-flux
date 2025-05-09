@@ -40,6 +40,11 @@ docker compose up --build app
 docker compose up --build test
 ```
 
+### index.html 접속
+```
+http://localhost:6001/index.html
+```
+
 
 ## 구현범위에대한설명
 
